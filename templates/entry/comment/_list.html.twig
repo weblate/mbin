@@ -40,7 +40,16 @@
 document.addEventListener('DOMContentLoaded', function() {
     const blockquotes = document.querySelectorAll('.comments-tree blockquote');
     blockquotes.forEach(function(blockquote) {
-        blockquote.addEventListener('click', function() {
+        blockquote.addEventListener('mouseup', function(e) {
+            const isTextSelected = window.getSelection().toString().length !== 0;
+            if (isTextSelected) {
+                return;
+            }
+            const blackListedElements = ['a', 'button']
+            if (blackListedElements.includes(e.target.tagName.toLowerCase())) {
+                return;
+            }
+
             const isHideAction = !blockquote.classList.contains('hide-nested')
             const levelMatch = blockquote.className.match(/comment-level--(\d+)/);
             const level = levelMatch ? parseInt(levelMatch[1], 10) : 1;
@@ -56,7 +65,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
                 }
 
-                nextSibling.style.display = isHideAction ? 'none' : 'block';
+                nextSibling.style.display = isHideAction ? 'none' : 'grid';
                 nextSibling = nextSibling.nextElementSibling;
                 updateCount++;
             }
