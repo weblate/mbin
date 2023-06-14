@@ -38,76 +38,75 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const comments = document.querySelectorAll('.comments-tree blockquote');
-    comments.forEach(function (comment) {
-        comment.addEventListener('mouseup', collapseCommentTree);
-        comment.addEventListener('touchend', collapseCommentTree);
+    const commentTree = document.querySelector('.comments-tree');
+    commentTree.addEventListener('mouseup', collapseCommentTree);
+    commentTree.addEventListener('touchend', collapseCommentTree);
 
-        function collapseCommentTree(e) {
-            const isTextSelected = window.getSelection().toString().length !== 0;
+    function collapseCommentTree(e) {
+        const comment = e.target.closest('blockquote');
+        const isTextSelected = window.getSelection().toString().length !== 0;
 
-            // Don't collapse if user is just trying to select some text
-            if (isTextSelected) {
-                return;
+        // Don't collapse if user is just trying to select some text
+        if (isTextSelected) {
+            return;
+        }
+
+        // Don't collapse if user is just clicking links / buttons
+        const blackListedElements = ['a', 'button']
+        if (blackListedElements.includes(e.target.tagName.toLowerCase())) {
+            return;
+        }
+
+        const isHideAction = !comment.classList.contains('hide-nested')
+        const levelMatch = comment.className.match(/comment-level--(\d+)/);
+        const level = levelMatch ? parseInt(levelMatch[1], 10) : 1;
+
+        let nextSibling = comment.nextElementSibling;
+        // If we're expanding the tree again, skip the "x comments collapsed..." sibling element
+        if (!isHideAction) { nextSibling = nextSibling.nextElementSibling; }
+
+        let updateCount = 0;
+        let lastComment;
+
+        while (nextSibling) {
+            const nextSiblingLevelMatch = nextSibling.className.match(/comment-level--(\d+)/);
+            const isComment = !nextSibling.classList.contains('collapsed-tree')
+
+            // If next comment is a no longer a child (next comment <= comment clicked), we're done
+            if (!nextSiblingLevelMatch || parseInt(nextSiblingLevelMatch[1], 10) <= level) {
+                lastComment = nextSibling;
+                break;
             }
 
-            // Don't collapse if user is just clicking links / buttons
-            const blackListedElements = ['a', 'button']
-            if (blackListedElements.includes(e.target.tagName.toLowerCase())) {
-                return;
-            }
-
-            const isHideAction = !comment.classList.contains('hide-nested')
-            const levelMatch = comment.className.match(/comment-level--(\d+)/);
-            const level = levelMatch ? parseInt(levelMatch[1], 10) : 1;
-
-            let nextSibling = comment.nextElementSibling;
-            // If we're expanding the tree again, skip the "x comments collapsed..." sibling element
-            if (!isHideAction) { nextSibling = nextSibling.nextElementSibling; }
-
-            let updateCount = 0;
-            let lastComment;
-
-            while (nextSibling) {
-                const nextSiblingLevelMatch = nextSibling.className.match(/comment-level--(\d+)/);
-                const isComment = !nextSibling.classList.contains('collapsed-tree')
-
-                // If next comment is a no longer a child (next comment <= comment clicked), we're done
-                if (!nextSiblingLevelMatch || parseInt(nextSiblingLevelMatch[1], 10) <= level) {
-                    lastComment = nextSibling;
-                    break;
-                }
-
-                // If we're expanding the tree and we see another "x comments collapsed..." (nested tree in nested tree)
-                // just delete it and continue expanding
-                
-                // TODO: Preserve nested comment trees in nested comments trees instead
-                if (!isHideAction && !isComment) {
-                    nextSibling.previousElementSibling.classList.toggle('hide-nested');
-                    const thisElement = nextSibling;
-                    nextSibling = nextSibling.nextElementSibling;
-                    thisElement.remove()
-                } else {
-                    nextSibling.style.display = isHideAction ? 'none' : 'grid';
-                    nextSibling = nextSibling.nextElementSibling;
-                    isComment && updateCount++;
-                }
-            }
-
-            // If nothing hidden / shown, don't add a banner on the bottom
-            if (updateCount < 1) { return; }
+            // If we're expanding the tree and we see another "x comments collapsed..." (nested tree in nested tree)
+            // just delete it and continue expanding
             
-            comment.classList.toggle('hide-nested');
-
-            if (isHideAction) {
-                const hiddenDiv = document.createElement('blockquote');
-                hiddenDiv.classList = `section comment collapsed-tree comment-level--${level}`
-                hiddenDiv.innerText = `${updateCount} comments collapsed...`;
-                comment.insertAdjacentElement('afterend', hiddenDiv);
+            // TODO: Preserve nested comment trees in nested comments trees instead
+            if (!isHideAction && !isComment) {
+                nextSibling.previousElementSibling.classList.toggle('hide-nested');
+                const thisElement = nextSibling;
+                nextSibling = nextSibling.nextElementSibling;
+                thisElement.remove()
             } else {
-                comment.nextElementSibling.remove()
+                nextSibling.style.display = isHideAction ? 'none' : 'grid';
+                nextSibling = nextSibling.nextElementSibling;
+                isComment && updateCount++;
             }
         }
-    });
+
+        // If nothing hidden / shown, don't add a banner on the bottom
+        if (updateCount < 1) { return; }
+        
+        comment.classList.toggle('hide-nested');
+
+        if (isHideAction) {
+            const hiddenDiv = document.createElement('blockquote');
+            hiddenDiv.classList = `section comment collapsed-tree comment-level--${level}`
+            hiddenDiv.innerText = `${updateCount} comments collapsed...`;
+            comment.insertAdjacentElement('afterend', hiddenDiv);
+        } else {
+            comment.nextElementSibling.remove()
+        }
+    }
 });
 </script>
