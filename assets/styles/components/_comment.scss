@@ -241,7 +241,7 @@ aside.comments {
 }
 
 .hide-nested{
-   row-gap: 0;
+  row-gap: 0;
   > div, > figure, > .vote, > footer {
     display: none;
   }
