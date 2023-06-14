@@ -81,7 +81,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // If we're expanding the tree and we see another "x comments collapsed..." (nested tree in nested tree)
             // just delete it and continue expanding
             
-            // TODO: Preserve nested comment trees in nested comments trees instead
+            // TODO: Add functionality to preserve nested comment trees in nested comments trees instead
             if (!isHideAction && !isComment) {
                 nextSibling.previousElementSibling.classList.toggle('hide-nested');
                 const thisElement = nextSibling;
@@ -94,10 +94,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
+        comment.classList.toggle('hide-nested');
+
         // If nothing hidden / shown, don't add a banner on the bottom
         if (updateCount < 1) { return; }
         
-        comment.classList.toggle('hide-nested');
 
         if (isHideAction) {
             const hiddenDiv = document.createElement('blockquote');

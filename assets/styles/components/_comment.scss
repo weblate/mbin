@@ -239,3 +239,10 @@ aside.comments {
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
 }
+
+.hide-nested{
+   row-gap: 0;
+  > div, > figure, > .vote, > footer {
+    display: none;
+  }
+}
