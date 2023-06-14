@@ -40,7 +40,10 @@
 document.addEventListener('DOMContentLoaded', function() {
     const blockquotes = document.querySelectorAll('.comments-tree blockquote');
     blockquotes.forEach(function(blockquote) {
-        blockquote.addEventListener('mouseup', function(e) {
+        blockquote.addEventListener('mouseup', handleTap);
+        blockquote.addEventListener('touchend', handleTap);
+
+        function handleTap(e) {
             const isTextSelected = window.getSelection().toString().length !== 0;
             if (isTextSelected) {
                 return;
@@ -84,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 lastBlockquote.remove()
             }
-        });
+        }
     });
 });
 </script>
