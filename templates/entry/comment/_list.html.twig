@@ -35,3 +35,47 @@
         <div class="comment-line--9"></div>
     {% endif %}
 </section>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const blockquotes = document.querySelectorAll('.comments-tree blockquote');
+    blockquotes.forEach(function(blockquote) {
+        blockquote.addEventListener('click', function() {
+            const isHideAction = !blockquote.classList.contains('hide-nested')
+            const levelMatch = blockquote.className.match(/comment-level--(\d+)/);
+            const level = levelMatch ? parseInt(levelMatch[1], 10) : 1;
+
+            let nextSibling = blockquote.nextElementSibling;
+            let updateCount = 0;
+            let lastBlockquote;
+
+            while (nextSibling) {
+                const nextSiblingLevelMatch = nextSibling.className.match(/comment-level--(\d+)/);
+                if (!nextSiblingLevelMatch || parseInt(nextSiblingLevelMatch[1], 10) <= level) {
+                    lastBlockquote = nextSibling;
+                    break;
+                }
+
+                nextSibling.style.display = isHideAction ? 'none' : 'block';
+                nextSibling = nextSibling.nextElementSibling;
+                updateCount++;
+            }
+
+            if (updateCount < 1) {
+                return;
+            }
+            
+            blockquote.classList.toggle('hide-nested');
+
+            if (isHideAction) {
+                const hiddenDiv = document.createElement('blockquote');
+                hiddenDiv.classList = `section comment collapsed-tree comment-level--${level}`
+                hiddenDiv.innerText = `${updateCount} comments collapsed...`;
+                lastBlockquote.insertAdjacentElement('beforebegin', hiddenDiv);
+            } else {
+                lastBlockquote.remove()
+            }
+        });
+    });
+});
+</script>
