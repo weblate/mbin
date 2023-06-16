@@ -27,21 +27,21 @@ $comment-margin-sm: .3rem;
   display: grid;
   font-size: .9rem;
   grid-gap: .5rem;
-  grid-template-areas: "avatar header vote"
-                         "avatar body body"
-                         "avatar meta meta"
-                         "avatar footer footer";
-  grid-template-columns: min-content auto min-content;
+  grid-template-areas: "indicator avatar header vote"
+    "indicator avatar body body"
+    "indicator avatar meta meta"
+    "indicator avatar footer footer";
+  grid-template-columns: min-content min-content auto min-content;
   margin: .5rem 0;
   padding: 1rem .5rem;
   position: relative;
   z-index: 2;
 
   @include media-breakpoint-down(sm) {
-    grid-template-areas: "avatar header vote"
-                         "body body body"
-                         "meta meta meta"
-                         "footer footer footer";
+    grid-template-areas: "indicator avatar header vote"
+                         "indicator body body body"
+                         "indicator meta meta meta"
+                         "indicator footer footer footer";
   }
 
   &:hover,
@@ -248,8 +248,11 @@ aside.comments {
   }
 }
 
-@include media-breakpoint-down(md) {
-  .comment-collapse-indicator-container {
-    display: none;
+.comment-collapse-indicator {
+  grid-area: indicator;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: var(--kbin-bg-nth);
   }
 }
