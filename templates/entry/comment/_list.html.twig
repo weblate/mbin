@@ -38,12 +38,20 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    const commentTree = document.querySelector('.comments-tree');
+    const COMMENTS_TREE_CLASS = 'comments-tree';
+    const COMMENT_ELEMENT = 'blockquote';
+    const COMMENT_LEVEL_CLASS_REGEXP = /comment-level--(\d+)/;
+    const HIDE_NESTED_CLASS = 'hide-nested';
+    const COLLAPSED_COMMENT_CLASS = 'collapsed-tree';
+    const HIDDEN_DIV_CLASS_LIST = (level) => `section comment ${COLLAPSED_COMMENT_CLASS} comment-level--${level}`;
+    const COLLAPSE_INDICATOR = 'comment-collapse-indicator'
+
+    const commentTree = document.querySelector(`.${COMMENTS_TREE_CLASS}`);
     commentTree.addEventListener('mouseup', collapseCommentTree);
     commentTree.addEventListener('touchend', collapseCommentTree);
 
     function collapseCommentTree(e) {
-        const comment = e.target.closest('blockquote');
+        const comment = e.target.closest(COMMENT_ELEMENT);
         const isTextSelected = window.getSelection().toString().length !== 0;
 
         // Don't collapse if user is just trying to select some text
@@ -53,18 +61,18 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Don't collapse if user is just clicking links / buttons
         const blackListedElements = ['a', 'button']
-        const whiteListedClass = 'comment-collapse-indicator'
+        const whiteListedClass = COLLAPSE_INDICATOR
         if (blackListedElements.includes(e.target.tagName.toLowerCase()) && !e.target.classList.contains(whiteListedClass)) {
             return;
         }
 
         // Don't interact if it's a collapse banner
-        if (e.target.classList.contains('collapsed-tree')) {
+        if (e.target.classList.contains(COLLAPSED_COMMENT_CLASS)) {
             return;
         }
 
-        const isHideAction = !comment.classList.contains('hide-nested')
-        const levelMatch = comment.className.match(/comment-level--(\d+)/);
+        const isHideAction = !comment.classList.contains(HIDE_NESTED_CLASS)
+        const levelMatch = comment.className.match(COMMENT_LEVEL_CLASS_REGEXP);
         const level = levelMatch ? parseInt(levelMatch[1], 10) : 1;
 
         let nextSibling = comment.nextElementSibling;
@@ -75,8 +83,8 @@ document.addEventListener('DOMContentLoaded', function() {
         let lastComment;
 
         while (nextSibling) {
-            const nextSiblingLevelMatch = nextSibling.className.match(/comment-level--(\d+)/);
-            const isComment = !nextSibling.classList.contains('collapsed-tree')
+            const nextSiblingLevelMatch = nextSibling.className.match(COMMENT_LEVEL_CLASS_REGEXP);
+            const isComment = !nextSibling.classList.contains(COLLAPSED_COMMENT_CLASS)
 
             // If next comment is a no longer a child (next comment <= comment clicked), we're done
             if (!nextSiblingLevelMatch || parseInt(nextSiblingLevelMatch[1], 10) <= level) {
@@ -89,7 +97,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // TODO: Add functionality to preserve nested comment trees in nested comments trees instead
             if (!isHideAction && !isComment) {
-                nextSibling.previousElementSibling.classList.toggle('hide-nested');
+                nextSibling.previousElementSibling.classList.toggle(HIDE_NESTED_CLASS);
                 const thisElement = nextSibling;
                 nextSibling = nextSibling.nextElementSibling;
                 thisElement.remove()
@@ -100,16 +108,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
 
-        comment.classList.toggle('hide-nested');
-        comment.querySelector('.comment-collapse-indicator').innerHTML = isHideAction ? '+' : '-'
+        comment.classList.toggle(HIDE_NESTED_CLASS);
+        comment.querySelector(`.${COLLAPSE_INDICATOR}`).innerHTML = isHideAction ? '+' : '-'
 
         // If nothing hidden / shown, don't add a banner on the bottom
         if (updateCount < 1) { return; }
         
 
         if (isHideAction) {
-            const hiddenDiv = document.createElement('blockquote');
-            hiddenDiv.classList = `section comment collapsed-tree comment-level--${level}`
+            const hiddenDiv = document.createElement(COMMENT_ELEMENT);
+            hiddenDiv.classList = HIDDEN_DIV_CLASS_LIST(level)
             hiddenDiv.innerText = `${updateCount} comments collapsed...`;
             comment.insertAdjacentElement('afterend', hiddenDiv);
         } else {
