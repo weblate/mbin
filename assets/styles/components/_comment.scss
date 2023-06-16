@@ -242,7 +242,16 @@ aside.comments {
 
 .hide-nested{
   row-gap: 0;
-  > div, > figure, > .vote, > footer {
+  > div, > .vote, > footer {
+    display: none;
+  }
+  > figure {
+    visibility: hidden;
+  }
+}
+
+@include media-breakpoint-down(md) {
+  .comment-collapse-indicator-container {
     display: none;
   }
 }

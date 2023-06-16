@@ -16,6 +16,7 @@
                 data-subject-parent-value="{{ comment.parent ? comment.parent.id : '' }}"
                 data-action="{{- app.request.cookies.get(constant('App\\Controller\\User\\ThemeSettingsController::KBIN_GENERAL_DYNAMIC_LISTS')) is same as 'true' ? 'notifications:Notification@window->subject#notification' : '' -}}">
             <header>
+                <span class="comment-collapse-indicator-container">[<a class="comment-collapse-indicator" href="#" onclick="return false;">-</a>]</span>
                 {% if comment.isAdult %}<span class="badge danger">+18</span>{% endif %}
                 {{ component('user_inline', {user: comment.user, showAvatar: false}) }},
                 {% if dateAsUrl %}

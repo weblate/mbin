@@ -53,7 +53,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Don't collapse if user is just clicking links / buttons
         const blackListedElements = ['a', 'button']
-        if (blackListedElements.includes(e.target.tagName.toLowerCase())) {
+        const whiteListedClass = 'comment-collapse-indicator'
+        if (blackListedElements.includes(e.target.tagName.toLowerCase()) && !e.target.classList.contains(whiteListedClass)) {
+            return;
+        }
+
+        // Don't interact if it's a collapse banner
+        if (e.target.classList.contains('collapsed-tree')) {
             return;
         }
 
@@ -95,6 +101,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
 
         comment.classList.toggle('hide-nested');
+        comment.querySelector('.comment-collapse-indicator').innerHTML = isHideAction ? '+' : '-'
 
         // If nothing hidden / shown, don't add a banner on the bottom
         if (updateCount < 1) { return; }
