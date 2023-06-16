@@ -95,7 +95,8 @@ document.addEventListener('DOMContentLoaded', function() {
             // If we're expanding the tree and we see another "x comments collapsed..." (nested tree in nested tree)
             // just delete it and continue expanding
             
-            // TODO: Add functionality to preserve nested comment trees in nested comments trees instead
+            // TODO #284: Add functionality to preserve nested comment trees in nested comments trees instead
+            // https://codeberg.org/Kbin/kbin-core/issues/284
             if (!isHideAction && !isComment) {
                 nextSibling.previousElementSibling.classList.toggle(HIDE_NESTED_CLASS);
                 const thisElement = nextSibling;
