@@ -241,12 +241,10 @@ aside.comments {
 }
 
 .hide-nested{
+  cursor: pointer;
   row-gap: 0;
   > div, > .vote, > footer {
     display: none;
-  }
-  > figure {
-    visibility: hidden;
   }
 }
 
