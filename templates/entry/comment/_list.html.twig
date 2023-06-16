@@ -44,7 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const HIDE_NESTED_CLASS = 'hide-nested';
     const COLLAPSED_COMMENT_CLASS = 'collapsed-tree';
     const HIDDEN_DIV_CLASS_LIST = (level) => `section comment ${COLLAPSED_COMMENT_CLASS} comment-level--${level}`;
-    const COLLAPSE_INDICATOR = 'comment-collapse-indicator'
+    const COLLAPSE_INDICATOR = 'comment-collapse-indicator';
 
     const commentTree = document.querySelector(`.${COMMENTS_TREE_CLASS}`);
     commentTree.addEventListener('mouseup', collapseCommentTree);
@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Don't collapse if user is just clicking links / buttons
         const blackListedElements = ['a', 'button']
-        const whiteListedClass = COLLAPSE_INDICATOR
+        const whiteListedClass = COLLAPSE_INDICATOR;
         if (blackListedElements.includes(e.target.tagName.toLowerCase()) && !e.target.classList.contains(whiteListedClass)) {
             return;
         }
@@ -71,7 +71,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const isHideAction = !comment.classList.contains(HIDE_NESTED_CLASS)
+        const isHideAction = !comment.classList.contains(HIDE_NESTED_CLASS);
         const levelMatch = comment.className.match(COMMENT_LEVEL_CLASS_REGEXP);
         const level = levelMatch ? parseInt(levelMatch[1], 10) : 1;
 
@@ -84,7 +84,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         while (nextSibling) {
             const nextSiblingLevelMatch = nextSibling.className.match(COMMENT_LEVEL_CLASS_REGEXP);
-            const isComment = !nextSibling.classList.contains(COLLAPSED_COMMENT_CLASS)
+            const isComment = !nextSibling.classList.contains(COLLAPSED_COMMENT_CLASS);
 
             // If next comment is a no longer a child (next comment <= comment clicked), we're done
             if (!nextSiblingLevelMatch || parseInt(nextSiblingLevelMatch[1], 10) <= level) {
@@ -100,7 +100,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 nextSibling.previousElementSibling.classList.toggle(HIDE_NESTED_CLASS);
                 const thisElement = nextSibling;
                 nextSibling = nextSibling.nextElementSibling;
-                thisElement.remove()
+                thisElement.remove();
             } else {
                 nextSibling.style.display = isHideAction ? 'none' : 'grid';
                 nextSibling = nextSibling.nextElementSibling;
@@ -117,11 +117,11 @@ document.addEventListener('DOMContentLoaded', function() {
 
         if (isHideAction) {
             const hiddenDiv = document.createElement(COMMENT_ELEMENT);
-            hiddenDiv.classList = HIDDEN_DIV_CLASS_LIST(level)
+            hiddenDiv.classList = HIDDEN_DIV_CLASS_LIST(level);
             hiddenDiv.innerText = `${updateCount} comments collapsed...`;
             comment.insertAdjacentElement('afterend', hiddenDiv);
         } else {
-            comment.nextElementSibling.remove()
+            comment.nextElementSibling.remove();
         }
     }
 });
