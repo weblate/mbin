@@ -235,9 +235,11 @@ aside.comments {
 }
 
 .collapsed-tree {
+  cursor: pointer;
   grid: none;
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
+  margin-top: 0;
 }
 
 .hide-nested{

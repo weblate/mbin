@@ -5,7 +5,7 @@ const COMMENT_LEVEL_CLASS_REGEXP = /comment-level--(\d+)/;
 const HIDE_NESTED_CLASS = "hide-nested";
 const COLLAPSED_COMMENT_CLASS = "collapsed-tree";
 const HIDDEN_DIV_CLASS_LIST = (level) =>
-`section comment ${COLLAPSED_COMMENT_CLASS} comment-level--${level}`;
+  `section comment ${COLLAPSED_COMMENT_CLASS} comment-level--${level}`;
 const COLLAPSE_INDICATOR = "comment-collapse-indicator";
 
 /* stimulusFetch: 'lazy' */
@@ -13,7 +13,11 @@ export default class extends Controller {
   toggleCommentTree(event) {
     event.preventDefault();
 
-    const comment = this.element;
+    // Comment is the "parent" comment of the comment thread
+    const comment = this.element.classList.contains(COLLAPSED_COMMENT_CLASS)
+      ? this.element.previousElementSibling
+      : this.element;
+
     const isHideAction = !comment.classList.contains(HIDE_NESTED_CLASS);
     const levelMatch = comment.className.match(COMMENT_LEVEL_CLASS_REGEXP);
     const level = levelMatch ? parseInt(levelMatch[1], 10) : 1;
@@ -72,9 +76,11 @@ export default class extends Controller {
     }
 
     if (isHideAction) {
-      const hiddenDiv = document.createElement(COMMENT_ELEMENT);
+      const hiddenDiv = document.createElement('a');
       hiddenDiv.classList = HIDDEN_DIV_CLASS_LIST(level);
       hiddenDiv.innerText = `${updateCount} comments collapsed...`;
+      hiddenDiv.setAttribute("data-controller", "comment-tree");
+      hiddenDiv.setAttribute("data-action", "comment-tree#toggleCommentTree");
       comment.insertAdjacentElement("afterend", hiddenDiv);
     } else {
       comment.nextElementSibling.remove();
