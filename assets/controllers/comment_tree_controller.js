@@ -66,9 +66,6 @@ export default class extends Controller {
     }
 
     comment.classList.toggle(HIDE_NESTED_CLASS);
-    comment.querySelector(`.${COLLAPSE_INDICATOR}`).innerHTML = isHideAction
-      ? "[+]"
-      : "[-]";
 
     // If nothing hidden / shown, don't add a banner on the bottom
     if (updateCount < 1) {

@@ -242,19 +242,27 @@ aside.comments {
   margin-top: 0;
 }
 
-.hide-nested{
-  cursor: pointer;
-  row-gap: 0;
-  > div, > .vote, > footer {
-    display: none;
-  }
-}
-
 .comment-collapse-indicator {
   grid-area: indicator;
   transition: all 0.2s ease-in-out;
 
   &:hover {
     background-color: var(--kbin-bg-nth);
+  }
+
+  .indicator-text::after {
+    content: "[-]";
+  }
+}
+
+.hide-nested{
+  cursor: pointer;
+  row-gap: 0;
+  > div, > .vote, > footer {
+    display: none;
+  }
+  
+  .indicator-text::after {
+    content: "[+]";
   }
 }
