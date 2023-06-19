@@ -12,9 +12,12 @@
                 'show-preview': app.request.cookies.get(constant('App\\Controller\\User\\ThemeSettingsController::KBIN_ENTRIES_SHOW_PREVIEW')) is same as 'true'
             })}).without('id') }}
                 id="entry-comment-{{ comment.id }}"
-                data-controller="comment subject"
+                data-controller="comment subject comment-tree"
                 data-subject-parent-value="{{ comment.parent ? comment.parent.id : '' }}"
                 data-action="{{- app.request.cookies.get(constant('App\\Controller\\User\\ThemeSettingsController::KBIN_GENERAL_DYNAMIC_LISTS')) is same as 'true' ? 'notifications:Notification@window->subject#notification' : '' -}}">
+            <a class="comment-collapse-indicator" href="{{ entry_url(comment.entry) }}#{{ get_url_fragment(comment) }}" data-action="comment-tree#toggleCommentTree">
+                <span class="indicator-text" />
+            </a>
             <header>
                 {% if comment.isAdult %}<span class="badge danger">+18</span>{% endif %}
                 {{ component('user_inline', {user: comment.user, showAvatar: false}) }},

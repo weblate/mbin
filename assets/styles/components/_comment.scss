@@ -27,21 +27,21 @@ $comment-margin-sm: .3rem;
   display: grid;
   font-size: .9rem;
   grid-gap: .5rem;
-  grid-template-areas: "avatar header vote"
-                         "avatar body body"
-                         "avatar meta meta"
-                         "avatar footer footer";
-  grid-template-columns: min-content auto min-content;
+  grid-template-areas: "indicator avatar header vote"
+    "indicator avatar body body"
+    "indicator avatar meta meta"
+    "indicator avatar footer footer";
+  grid-template-columns: min-content min-content auto min-content;
   margin: .5rem 0;
   padding: 1rem .5rem;
   position: relative;
   z-index: 2;
 
   @include media-breakpoint-down(sm) {
-    grid-template-areas: "avatar header vote"
-                         "body body body"
-                         "meta meta meta"
-                         "footer footer footer";
+    grid-template-areas: "indicator avatar header vote"
+                         "indicator body body body"
+                         "indicator meta meta meta"
+                         "indicator footer footer footer";
   }
 
   &:hover,
@@ -232,4 +232,37 @@ aside.comments {
 
 #comment-add {
   margin: .5rem 0;
+}
+
+.collapsed-tree {
+  cursor: pointer;
+  grid: none;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+  margin-top: 0;
+}
+
+.comment-collapse-indicator {
+  grid-area: indicator;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: var(--kbin-bg-nth);
+  }
+
+  .indicator-text::after {
+    content: "[-]";
+  }
+}
+
+.hide-nested{
+  cursor: pointer;
+  row-gap: 0;
+  > div, > .vote, > footer {
+    display: none;
+  }
+  
+  .indicator-text::after {
+    content: "[+]";
+  }
 }
