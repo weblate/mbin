@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Markdown\CommonMark;
 
+use App\Message\LinkEmbedMessage;
 use App\Repository\EmbedRepository;
 use App\Service\ImageManager;
 use App\Service\MentionManager;
@@ -17,15 +18,16 @@ use League\CommonMark\Inline\Element\Text;
 use League\CommonMark\Inline\Renderer\InlineRendererInterface;
 use League\CommonMark\Util\ConfigurationAwareInterface;
 use League\CommonMark\Util\ConfigurationInterface;
+use Symfony\Component\Messenger\MessageBusInterface;
 
 final class ExternalLinkRenderer implements InlineRendererInterface, ConfigurationAwareInterface
 {
     private ConfigurationInterface $config;
 
     public function __construct(
-        private readonly Embed $embed,
         private readonly EmbedRepository $embedRepository,
-        private readonly SettingsManager $settingsManager
+        private readonly SettingsManager $settingsManager,
+        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -44,32 +46,15 @@ final class ExternalLinkRenderer implements InlineRendererInterface, Configurati
         }
 
         $embed = false;
-        try {
-            if (filter_var($url, FILTER_VALIDATE_URL) && !str_starts_with($title, '@') && !str_starts_with(
-                    $title,
-                    '#'
-                )) {
-                if ($entity = $this->embedRepository->findOneBy(['url' => $url])) {
-                    $embed = $entity->hasEmbed;
-                } else {
-                    try {
-                        $embed = $this->embed->fetch($url)->html;
-                        if ($embed) {
-                            $entity = new \App\Entity\Embed($url, (bool)$embed);
-                            $this->embedRepository->add($entity);
-                        }
-                    } catch (\Exception $e) {
-                        $embed = false;
-                    }
-
-                    if (!$embed) {
-                        $entity = new \App\Entity\Embed($url, $embed = false);
-                        $this->embedRepository->add($entity);
-                    }
-                }
+        if (filter_var($url, FILTER_VALIDATE_URL) && !str_starts_with($title, '@') && !str_starts_with(
+                $title,
+                '#'
+            )) {
+            if ($entity = $this->embedRepository->findOneBy(['url' => $url])) {
+                $embed = $entity->hasEmbed;
+            } else {
+                $this->bus->dispatch(new LinkEmbedMessage($url));
             }
-        } catch (\Exception $e) {
-            $embed = null;
         }
 
         if (ImageManager::isImageUrl($url) || $embed) {
