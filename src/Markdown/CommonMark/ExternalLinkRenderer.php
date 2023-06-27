@@ -4,12 +4,10 @@ declare(strict_types=1);
 
 namespace App\Markdown\CommonMark;
 
-use App\Message\LinkEmbedMessage;
 use App\Repository\EmbedRepository;
 use App\Service\ImageManager;
 use App\Service\MentionManager;
 use App\Service\SettingsManager;
-use App\Utils\Embed;
 use League\CommonMark\ElementRendererInterface;
 use League\CommonMark\HtmlElement;
 use League\CommonMark\Inline\Element\AbstractInline;
@@ -18,7 +16,6 @@ use League\CommonMark\Inline\Element\Text;
 use League\CommonMark\Inline\Renderer\InlineRendererInterface;
 use League\CommonMark\Util\ConfigurationAwareInterface;
 use League\CommonMark\Util\ConfigurationInterface;
-use Symfony\Component\Messenger\MessageBusInterface;
 
 final class ExternalLinkRenderer implements InlineRendererInterface, ConfigurationAwareInterface
 {
@@ -27,7 +24,6 @@ final class ExternalLinkRenderer implements InlineRendererInterface, Configurati
     public function __construct(
         private readonly EmbedRepository $embedRepository,
         private readonly SettingsManager $settingsManager,
-        private readonly MessageBusInterface $bus,
     ) {
     }
 
@@ -52,8 +48,6 @@ final class ExternalLinkRenderer implements InlineRendererInterface, Configurati
             )) {
             if ($entity = $this->embedRepository->findOneBy(['url' => $url])) {
                 $embed = $entity->hasEmbed;
-            } else {
-                $this->bus->dispatch(new LinkEmbedMessage($url));
             }
         }
 
