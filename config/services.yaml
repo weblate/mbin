@@ -177,3 +177,51 @@ services:
   debril.rss_atom.provider:
     class: App\Feed\Provider
     arguments: [ '@App\Service\FeedManager' ]
+
+  # Twig cache
+  cache.filesystem:
+    class: Symfony\Component\Cache\Adapter\FilesystemAdapter
+    arguments:
+      - 'kbin'
+      - 0
+      - '%kernel.cache_dir%'
+
+  cache.filesystem_tag_aware:
+    class: Symfony\Component\Cache\Adapter\FilesystemTagAwareAdapter
+    arguments:
+      - 'kbin'
+      - 0
+      - '%kernel.cache_dir%'
+
+  App\Twig\Components\ActiveUsersComponent:
+    arguments:
+      $cache: '@cache.filesystem'
+
+  App\Twig\Components\RelatedMagazinesComponent:
+    arguments:
+      $cache: '@cache.filesystem'
+
+  App\Twig\Components\RelatedEntriesComponent:
+    arguments:
+      $cache: '@cache.filesystem'
+
+  App\Twig\Components\RelatedPostsComponent:
+    arguments:
+      $cache: '@cache.filesystem'
+
+  App\Twig\Components\VotersInlineComponent:
+    arguments:
+      $cache: '@cache.filesystem'
+
+  App\Twig\Components\PostCommentsNestedComponent:
+    arguments:
+      $cache: '@cache.filesystem_tag_aware'
+
+  App\Twig\Components\EntryCommentsNestedComponent:
+    arguments:
+      $cache: '@cache.filesystem_tag_aware'
+
+  App\Twig\Components\PostCommentsPreviewComponent:
+    arguments:
+      $cache: '@cache.filesystem_tag_aware'
+

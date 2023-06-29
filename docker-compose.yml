@@ -12,6 +12,8 @@ services:
     volumes:
       - php_socket:/var/run/php
       - ./:/srv/app
+#      - ./:/srv/app/var/cache/prod/kbin
+#      - ./:/srv/app/var/cache/dev/kbin
     healthcheck:
       interval: 10s
       timeout: 3s
@@ -102,6 +104,8 @@ services:
     volumes:
       - ./:/srv/app
       - php_socket:/var/run/php
+#      - ./:/srv/app/var/cache/prod/kbin
+#      - ./:/srv/app/var/cache/dev/kbin
     healthcheck:
       interval: 20s
       timeout: 3s
@@ -130,6 +134,8 @@ services:
     volumes:
       - ./:/srv/app
       - php_socket:/var/run/php
+#      - ./:/srv/app/var/cache/prod/kbin
+#      - ./:/srv/app/var/cache/dev/kbin
     healthcheck:
       interval: 20s
       timeout: 3s
