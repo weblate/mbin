@@ -7,6 +7,7 @@ namespace App\Command\AwesomeBot;
 use App\DTO\BadgeDto;
 use App\DTO\MagazineDto;
 use App\Entity\Magazine;
+use App\Repository\MagazineRepository;
 use App\Repository\UserRepository;
 use App\Service\BadgeManager;
 use App\Service\MagazineManager;
@@ -26,7 +27,8 @@ use Symfony\Component\HttpClient\HttpClient;
 class AwesomeBotMagazine extends Command
 {
     public function __construct(
-        private readonly UserRepository $repository,
+        private readonly UserRepository $userRepository,
+        private readonly MagazineRepository $magazineRepository,
         private readonly MagazineManager $magazineManager,
         private readonly BadgeManager $badgeManager
     ) {
@@ -48,7 +50,12 @@ class AwesomeBotMagazine extends Command
     {
         $io = new SymfonyStyle($input, $output);
 
-        $user = $this->repository->findOneByUsername($input->getArgument('username'));
+        $user = $this->userRepository->findOneByUsername($input->getArgument('username'));
+        $magazine = $this->magazineRepository->findOneByName($input->getArgument('magazine_name'));
+
+        if($magazine) {
+            return Command::INVALID;
+        }
 
         if (!$user) {
             $io->error('User doesn\'t exist.');
@@ -72,6 +79,7 @@ class AwesomeBotMagazine extends Command
             );
         } catch (\Exception $e) {
             $io->error('Can\'t create magazine');
+            $io->error($e->getMessage());
 
             return Command::FAILURE;
         }
@@ -80,27 +88,27 @@ class AwesomeBotMagazine extends Command
     }
 
     #[Pure]
- private function createBadges(Magazine $magazine, string $url, array $tags): Collection
- {
-     $browser = new HttpBrowser(HttpClient::create());
-     $crawler = $browser->request('GET', $url);
+    private function createBadges(Magazine $magazine, string $url, array $tags): Collection
+    {
+        $browser = new HttpBrowser(HttpClient::create());
+        $crawler = $browser->request('GET', $url);
 
-     $content = $crawler->filter('.markdown-body')->first()->children();
+        $content = $crawler->filter('.markdown-body')->first()->children();
 
-     $labels = [];
-     foreach ($content as $elem) {
-         if (in_array($elem->nodeName, $tags)) {
-             $labels[] = $elem->nodeValue;
-         }
-     }
+        $labels = [];
+        foreach ($content as $elem) {
+            if (in_array($elem->nodeName, $tags)) {
+                $labels[] = $elem->nodeValue;
+            }
+        }
 
-     $badges = [];
-     foreach ($labels as $label) {
-         $this->badgeManager->create(
-             (new BadgeDto())->create($magazine, $label)
-         );
-     }
+        $badges = [];
+        foreach ($labels as $label) {
+            $this->badgeManager->create(
+                (new BadgeDto())->create($magazine, $label)
+            );
+        }
 
-     return new ArrayCollection($badges);
- }
+        return new ArrayCollection($badges);
+    }
 }

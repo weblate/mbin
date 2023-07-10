@@ -100,7 +100,7 @@ class AwesomeBotFixtures extends Command
                             'user' => $user,
                             'title' => $li->nodeValue,
                             'url' => $li->firstChild->getAttribute('href'),
-                            'badges' => new ArrayCollection(array_filter($tags, fn ($v) => is_string($v))),
+                            'badges' => new ArrayCollection(array_filter(array_unique($tags), fn ($v) => is_string($v))),
                         ];
                     }
                 }
@@ -123,6 +123,7 @@ class AwesomeBotFixtures extends Command
             $dto->title = substr($item['title'], 0, 255);
             $dto->url = $item['url'];
             $dto->badges = $item['badges'];
+            $dto->lang = 'en';
 
             $entry = $this->entryManager->create($dto, $item['user']);
 
