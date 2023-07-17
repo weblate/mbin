@@ -30,7 +30,7 @@
   }
 
   .section {
-    padding: .5rem .5rem 1rem;
+    padding: .5rem;
   }
 
   .sidebar-options {
@@ -301,7 +301,7 @@
   .settings-list {
     display: flex;
     flex-flow: row wrap;
-    gap: .25rem;
+    gap: 1px;
     align-items: center;
     color: var(--kbin-meta-text-color);
 
@@ -311,12 +311,13 @@
 
     .reload-required-section {
       z-index: 1;
-      background: var(--kbin-section-bg);
-      position: sticky;
-      top: 0;
+      background: var(--kbin-button-secondary-bg);
+      border: var(--kbin-button-secondary-border);
       display: none;
+      margin-top: .5rem;
       text-align: center;
       width: 100%;
+      order: 1;
       animation: showReloadRequired .25s ease-in-out forwards;
       @keyframes showReloadRequired {
         0% {
@@ -332,16 +333,21 @@
         }
       }
 
-      .topbar & {
-        top: 1.25rem;
+      .rounded-edges & {
+        border-radius: var(--kbin-rounded-edges-radius);
       }
 
-      .fixed-navbar & {
-        top: 3.25rem;
+      .btn {
+        width: 100%;
+
+        &:hover {
+          color: var(--kbin-button-secondary-text-hover-color);
+        }
       }
 
-      .fixed-navbar.topbar & {
-        top: 4.5rem;
+      &:hover {
+        background: var(--kbin-button-secondary-hover-bg);
+        color: var(--kbin-button-secondary-text-hover-color);
       }
 
       /** Faster spin animation than fa-spin */
@@ -362,6 +368,19 @@
       margin-top: .5rem;
       display: block;
       flex: 100%;
+      font-weight: 700;
+      font-variant: all-small-caps;
+      margin-left: .3125rem;
+      color: var(--kbin-meta-text-color);
+      opacity: .5;
+
+      &+.settings-row {
+        .rounded-edges & {
+          border-top-left-radius: .375rem;
+          border-top-right-radius: .375rem;
+          overflow: clip;
+        }
+      }
     }
 
     .row {
