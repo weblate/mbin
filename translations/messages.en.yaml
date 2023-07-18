@@ -378,7 +378,7 @@ send_message: Send message
 message: Message
 infinite_scroll: Infinite scroll
 show_top_bar: Show top bar
-sticky_navbar: Keep navbar visible while scrolling
+sticky_navbar: Sticky navbar
 subject_reported: Content has been reported.
 sidebar_position: Sidebar position
 left: Left
@@ -461,7 +461,7 @@ random_magazines: Random magazines
 magazine_panel_tags_info: Provide only if you want content from the fediverse to be
   included in this magazine based on tags
 sidebar: Sidebar
-auto_preview: Auto-expand media preview
+auto_preview: Auto media preview
 dynamic_lists: Dynamic lists
 banned_instances: Banned instances
 kbin_intro_title: Explore the Fediverse
