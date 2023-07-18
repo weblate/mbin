@@ -486,11 +486,6 @@
     }
   }
 
-  //&:hover,
-  //&:focus-within {
-  //  @include fade-in(.5s, .85);
-  //}
-
   .intro {
     .container {
       background: url('/assets/images/intro-bg.png') no-repeat center 20%;
@@ -548,7 +543,6 @@
     }
 
     a {
-      //font-weight: bold;
       color: var(--kbin-text-color);
     }
   }
