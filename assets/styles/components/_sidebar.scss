@@ -259,41 +259,81 @@
     display: flex;
     gap: 1rem;
     justify-content: center;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
     align-items: flex-end;
     flex-flow: row wrap;
+
+    & + .settings {
+      margin-bottom: .5rem;
+    }
 
     &:last-of-type {
       margin-bottom: 0;
     }
 
     .theme {
-      border: var(--kbin-avatar-border);
-      height: 1.5625rem;
-      width: 1.5625rem;
+      filter: drop-shadow(1px 2px 3px hsl(0, 0%, 0%, .25));
+      height: 2rem;
+      width: 2rem;
 
       &.light {
-        background: #fafafa;
+        background: url("/assets/images/light.svg") no-repeat;
+        background-size: 2rem;
+        background-position: center;
+
+        .theme--light & {
+          outline: 2px solid var(--kbin-sidebar-settings-switch-on-bg);
+        }
       }
 
       &.dark {
-        background: #1c1c1c;
+        background: url("/assets/images/dark.svg") no-repeat;
+        background-size: 2rem;
+        background-position: center;
+
+        .theme--dark & {
+          outline: 2px solid var(--kbin-sidebar-settings-switch-on-bg);
+        }
       }
 
       &.kbin {
-        background: #34363b;
+        background: url("/assets/images/kbin.svg") no-repeat;
+        background-size: 2rem;
+        background-position: center;
+
+        .theme--kbin & {
+          outline: 2px solid var(--kbin-sidebar-settings-switch-on-bg);
+        }
       }
 
       &.solarized-light {
-        background: #fdf6e3;
+        background: url("/assets/images/solarized.svg") no-repeat;
+        background-size: 2rem;
+        background-position: center;
+
+        .theme--solarized-light & {
+          outline: 2px solid var(--kbin-sidebar-settings-switch-on-bg);
+        }
       }
 
       &.solarized-dark {
-        background: #093642;
+        background: url("/assets/images/solarized-dark.svg") no-repeat;
+        background-size: 2rem;
+        background-position: center;
+
+        .theme--solarized-dark & {
+          outline: 2px solid var(--kbin-sidebar-settings-switch-on-bg);
+        }
       }
 
       &.tokyo-night {
-        background: #2A2A3C;
+        background: url("/assets/images/tokyo-night.svg") no-repeat;
+        background-size: 2rem;
+        background-position: center;
+
+        .theme--tokyo-night & {
+          outline: 2px solid var(--kbin-sidebar-settings-switch-on-bg);
+        }
       }
     }
   }
