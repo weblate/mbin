@@ -15,7 +15,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
-use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class DeleteClientApi extends BaseApi
@@ -45,10 +44,8 @@ class DeleteClientApi extends BaseApi
             new OA\Header(header: 'X-RateLimit-Limit', schema: new OA\Schema(type: 'integer'), description: 'Number of requests available'),
         ]
     )]
-    #[OA\RequestBody(content: new Model(
-        type: OAuth2ClientDto::class,
-        groups: ['deleting']
-    ))]
+    #[OA\Parameter(name: 'client_id', in: 'query', schema: new OA\Schema(type: 'string'), required: true)]
+    #[OA\Parameter(name: 'client_secret', in: 'query', schema: new OA\Schema(type: 'string'), required: true)]
     #[OA\Tag(name: 'oauth')]
     /**
      * This endpoint deactivates a client given their client_id and client_secret.
@@ -63,13 +60,14 @@ class DeleteClientApi extends BaseApi
         EntityManagerInterface $entityManager,
         CredentialsRevokerInterface $revoker,
         ValidatorInterface $validator,
-        SerializerInterface $serializer,
         RateLimiterFactory $apiOauthClientDeleteLimiter
     ): JsonResponse {
         $headers = $this->rateLimit(anonLimiterFactory: $apiOauthClientDeleteLimiter);
 
-        /** @var OAuth2ClientDto $dto */
-        $dto = $serializer->deserialize($request->getContent(), OAuth2ClientDto::class, 'json', ['groups' => ['deleting']]);
+        
+        $dto = new OAuth2ClientDto(null);
+        $dto->identifier = $request->get('client_id');
+        $dto->secret = $request->get('client_secret');
 
         $validatorGroups = ['deleting'];
         $errors = $validator->validate($dto, groups: $validatorGroups);

@@ -197,8 +197,8 @@ class CreateClientApi extends BaseApi
         ),
         encoding: [
             'imageUpload' => [
-                'contentType' => ImageManager::IMAGE_MIMETYPES,
-            ],
+                'contentType' => ImageManager::IMAGE_MIMETYPE_STR
+            ]
         ]
     ))]
     #[OA\Tag(name: 'oauth')]
@@ -295,7 +295,7 @@ class CreateClientApi extends BaseApi
         );
     }
 
-    protected function deserializeClientFromForm(Request $request, OAuth2ClientDto $dto = null): OAuth2ClientDto
+    protected function deserializeClientFromForm(Request $request, ?OAuth2ClientDto $dto = null): OAuth2ClientDto
     {
         $dto = $dto ? $dto : new OAuth2ClientDto(null);
         $dto->name = $request->get('name', $dto->name);
