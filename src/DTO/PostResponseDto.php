@@ -6,12 +6,10 @@ namespace App\DTO;
 
 use App\Entity\Contracts\VisibilityInterface;
 use App\Entity\Post;
-use DateTimeInterface;
-use JsonSerializable;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema()]
-class PostResponseDto implements JsonSerializable
+class PostResponseDto implements \JsonSerializable
 {
     public int $postId;
     public ?UserSmallResponseDto $user = null;
@@ -36,19 +34,19 @@ class PostResponseDto implements JsonSerializable
     public ?\DateTimeImmutable $createdAt = null;
     public ?\DateTimeImmutable $editedAt = null;
     public ?\DateTime $lastActive = null;
-    
+
     public function __construct(PostDto|Post $dto)
     {
         $this->postId = $dto->getId();
         $this->user = new UserSmallResponseDto($dto->user);
         $this->magazine = new MagazineSmallResponseDto($dto->magazine);
-        if($dto->image) {
+        if ($dto->image) {
             $this->image = $dto->image instanceof ImageDto ? $dto->image : new ImageDto($dto->image);
         }
         $this->body = $dto->body;
         $this->lang = $dto->lang;
         $this->isAdult = $dto->isAdult;
-        if($dto instanceof PostDto) {
+        if ($dto instanceof PostDto) {
             $this->comments = $dto->comments;
             $this->uv = $dto->uv;
             $this->dv = $dto->dv;
@@ -86,10 +84,10 @@ class PostResponseDto implements JsonSerializable
             'apId' => $this->apId,
             'tags' => $this->tags,
             'mentions' => $this->mentions,
-            'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
-            'editedAt' => $this->editedAt?->format(DateTimeInterface::ATOM),
-            'lastActive' => $this->lastActive?->format(DateTimeInterface::ATOM),
-            'slug' => $this->slug
+            'createdAt' => $this->createdAt->format(\DateTimeInterface::ATOM),
+            'editedAt' => $this->editedAt?->format(\DateTimeInterface::ATOM),
+            'lastActive' => $this->lastActive?->format(\DateTimeInterface::ATOM),
+            'slug' => $this->slug,
         ];
     }
 }

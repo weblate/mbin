@@ -4,17 +4,14 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
-use App\DTO\EntryCommentDto;
 use App\Entity\Contracts\VisibilityInterface;
 use App\Entity\EntryComment;
 use App\Factory\EntryCommentFactory;
-use DateTimeInterface;
-use JsonSerializable;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema()]
-class EntryCommentResponseDto implements JsonSerializable
+class EntryCommentResponseDto implements \JsonSerializable
 {
     public int $commentId;
     public ?UserSmallResponseDto $user = null;
@@ -51,11 +48,11 @@ class EntryCommentResponseDto implements JsonSerializable
                 'commentid' => 0,
                 'user' => [
                     'userId' => 0,
-                    'username' => 'test'
+                    'username' => 'test',
                 ],
                 'magazine' => [
                     'magazineId' => 0,
-                    'name' => 'test'
+                    'name' => 'test',
                 ],
                 'entryId' => 0,
                 'parentId' => 0,
@@ -74,26 +71,26 @@ class EntryCommentResponseDto implements JsonSerializable
                 'visibility' => 'visible',
                 'apId' => 'string',
                 'mentions' => [
-                    '@user@instance'
+                    '@user@instance',
                 ],
                 'tags' => [
-                    'string'
+                    'string',
                 ],
                 'createdAt' => '2023-06-18 11:59:41-07:00',
                 'editedAt' => '2023-06-18 11:59:41-07:00',
-                'lastActive' => '2023-06-18 12:00:45-07:00', 
+                'lastActive' => '2023-06-18 12:00:45-07:00',
                 'childCount' => 0,
-                'children' => []
-            ]
+                'children' => [],
+            ],
         ]
     )]
     public array $children = [];
     #[OA\Property(description: 'The total number of children the comment has.')]
     public int $childCount = 0;
-    
-    public function __construct(EntryCommentDto|EntryComment $dto, ?EntryComment $parent = null, int $childCount = 0)
+
+    public function __construct(EntryCommentDto|EntryComment $dto, EntryComment $parent = null, int $childCount = 0)
     {
-        if(null == $parent) {
+        if (null == $parent) {
             $parent = $dto->parent;
         }
         $this->commentId = $dto->getId();
@@ -106,7 +103,7 @@ class EntryCommentResponseDto implements JsonSerializable
         $this->body = $dto->body;
         $this->lang = $dto->lang;
         $this->isAdult = $dto->isAdult;
-        if($dto instanceof EntryCommentDto) {
+        if ($dto instanceof EntryCommentDto) {
             $this->uv = $dto->uv;
             $this->dv = $dto->dv;
         } else {
@@ -133,11 +130,11 @@ class EntryCommentResponseDto implements JsonSerializable
     {
         $toReturn = new EntryCommentResponseDto($factory->createDto($comment), $comment->parent, array_reduce($comment->children->toArray(), self::class.'::recursiveChildCount', 0));
 
-        if($depth === 0) {
+        if (0 === $depth) {
             return $toReturn;
         }
-        
-        foreach($comment->children as $childComment) {
+
+        foreach ($comment->children as $childComment) {
             assert($childComment instanceof EntryComment);
             $child = self::fromTree($childComment, $factory, $depth > 0 ? $depth - 1 : -1);
             array_push($toReturn->children, $child);
@@ -166,11 +163,11 @@ class EntryCommentResponseDto implements JsonSerializable
             'apId' => $this->apId,
             'mentions' => $this->mentions,
             'tags' => $this->tags,
-            'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
-            'editedAt' => $this->editedAt->format(DateTimeInterface::ATOM),
-            'lastActive' => $this->lastActive?->format(DateTimeInterface::ATOM),
+            'createdAt' => $this->createdAt->format(\DateTimeInterface::ATOM),
+            'editedAt' => $this->editedAt->format(\DateTimeInterface::ATOM),
+            'lastActive' => $this->lastActive?->format(\DateTimeInterface::ATOM),
             'childCount' => $this->childCount,
-            'children' => array_map(fn (EntryCommentResponseDto $child) => $child->jsonSerialize(), $this->children)
+            'children' => array_map(fn (EntryCommentResponseDto $child) => $child->jsonSerialize(), $this->children),
         ];
     }
 }

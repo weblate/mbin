@@ -7,12 +7,10 @@ namespace App\DTO;
 use App\Entity\Contracts\VisibilityInterface;
 use App\Entity\PostComment;
 use App\Factory\PostCommentFactory;
-use DateTimeInterface;
-use JsonSerializable;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema()]
-class PostCommentResponseDto implements JsonSerializable
+class PostCommentResponseDto implements \JsonSerializable
 {
     public int $commentId;
     public ?UserSmallResponseDto $user = null;
@@ -63,18 +61,18 @@ class PostCommentResponseDto implements JsonSerializable
                 'visibility' => 'visible',
                 'apId' => 'string',
                 'mentions' => [
-                    '@user@instance'
+                    '@user@instance',
                 ],
                 'createdAt' => '2023-06-18 11:59:41+00:00',
                 'lastActive' => '2023-06-18 12:00:45+00:00',
                 'childCount' => 0,
-                'children' => []
-            ]
+                'children' => [],
+            ],
         ]
     )]
     public array $children = [];
-    
-    public function __construct(PostCommentDto|PostComment $dto, ?PostComment $parent = null, int $childCount = 0)
+
+    public function __construct(PostCommentDto|PostComment $dto, PostComment $parent = null, int $childCount = 0)
     {
         $this->commentId = $dto->getId();
         $this->user = new UserSmallResponseDto($dto->user);
@@ -82,13 +80,13 @@ class PostCommentResponseDto implements JsonSerializable
         $this->postId = $dto->post->getId();
         $this->parentId = $parent ? $parent->getId() : null;
         $this->rootId = $parent ? ($parent->root ? $parent->root->getId() : $parent->getId()) : null;
-        if($dto->image) {
+        if ($dto->image) {
             $this->image = $dto->image instanceof ImageDto ? $dto->image : new ImageDto($dto->image);
         }
         $this->body = $dto->body;
         $this->lang = $dto->lang;
         $this->isAdult = $dto->isAdult;
-        if($dto instanceof PostCommentDto) {
+        if ($dto instanceof PostCommentDto) {
             $this->uv = $dto->uv;
             $this->favourites = $dto->favourites;
         } else {
@@ -122,10 +120,10 @@ class PostCommentResponseDto implements JsonSerializable
             'visibility' => $this->visibility,
             'apId' => $this->apId,
             'mentions' => $this->mentions,
-            'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
-            'lastActive' => $this->lastActive?->format(DateTimeInterface::ATOM),
+            'createdAt' => $this->createdAt->format(\DateTimeInterface::ATOM),
+            'lastActive' => $this->lastActive?->format(\DateTimeInterface::ATOM),
             'childCount' => $this->childCount,
-            'children' => $this->children
+            'children' => $this->children,
         ];
     }
 
@@ -134,16 +132,15 @@ class PostCommentResponseDto implements JsonSerializable
         return 1 + array_reduce($child->children->toArray(), self::class.'::recursiveChildCount', $initial);
     }
 
-
     public static function fromTree(PostComment $comment, PostCommentFactory $factory, int $depth): PostCommentResponseDto
     {
         $toReturn = new PostCommentResponseDto($factory->createDto($comment), $comment->parent, array_reduce($comment->children->toArray(), self::class.'::recursiveChildCount', 0));
 
-        if($depth === 0) {
+        if (0 === $depth) {
             return $toReturn;
         }
-        
-        foreach($comment->children as $childComment) {
+
+        foreach ($comment->children as $childComment) {
             assert($childComment instanceof PostComment);
             $child = self::fromTree($childComment, $factory, $depth > 0 ? $depth - 1 : -1);
             array_push($toReturn->children, $child);

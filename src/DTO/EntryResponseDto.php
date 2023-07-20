@@ -7,12 +7,10 @@ namespace App\DTO;
 use App\Entity\Contracts\VisibilityInterface;
 use App\Entity\Domain;
 use App\Entity\Entry;
-use DateTimeInterface;
-use JsonSerializable;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema()]
-class EntryResponseDto implements JsonSerializable
+class EntryResponseDto implements \JsonSerializable
 {
     public int $entryId;
     public ?MagazineSmallResponseDto $magazine = null;
@@ -40,7 +38,7 @@ class EntryResponseDto implements JsonSerializable
     public ?string $visibility = VisibilityInterface::VISIBILITY_VISIBLE;
     public ?string $slug = null;
     public ?string $apId = null;
-    
+
     public function __construct(EntryDto|Entry $dto)
     {
         $this->entryId = $dto->getId();
@@ -49,13 +47,13 @@ class EntryResponseDto implements JsonSerializable
         $this->domain = $dto->domain instanceof Domain ? DomainDto::createFromDomain($dto->domain) : $dto->domain;
         $this->title = $dto->title;
         $this->url = $dto->url;
-        if($dto->image) {
+        if ($dto->image) {
             $this->image = $dto->image instanceof ImageDto ? $dto->image : new ImageDto($dto->image);
         }
         $this->body = $dto->body;
         $this->lang = $dto->lang;
         $this->tags = $dto->tags;
-        if($dto instanceof EntryDto) {
+        if ($dto instanceof EntryDto) {
             $this->numComments = $dto->comments;
             $this->uv = $dto->uv;
             $this->dv = $dto->dv;
@@ -99,9 +97,9 @@ class EntryResponseDto implements JsonSerializable
             'isAdult' => $this->isAdult,
             'isPinned' => $this->isPinned,
             'views' => $this->views,
-            'createdAt' => $this->createdAt->format(DateTimeInterface::ATOM),
-            'editedAt' => $this->editedAt?->format(DateTimeInterface::ATOM),
-            'lastActive' => $this->lastActive?->format(DateTimeInterface::ATOM),
+            'createdAt' => $this->createdAt->format(\DateTimeInterface::ATOM),
+            'editedAt' => $this->editedAt?->format(\DateTimeInterface::ATOM),
+            'lastActive' => $this->lastActive?->format(\DateTimeInterface::ATOM),
             'visibility' => $this->visibility,
             'slug' => $this->slug,
             'apId' => $this->apId,

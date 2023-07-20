@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\DTO;
 
 use App\Entity\Magazine;
-use JsonSerializable;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema()]
-class MagazineSmallResponseDto implements JsonSerializable
+class MagazineSmallResponseDto implements \JsonSerializable
 {
     public ?string $name = null;
     public ?int $magazineId = null;
