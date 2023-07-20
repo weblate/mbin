@@ -51,5 +51,4 @@ class NotificationSchema
         new OA\Schema(ref: new Model(type: MagazineBanResponseDto::class)),
     ])]
     public mixed $subject = null;
-
 }

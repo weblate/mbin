@@ -43,10 +43,9 @@ class OAuth2ClientAccessRepository extends ServiceEntityRepository
         string $intervalStr,
         ?\DateTime $start,
         ?\DateTime $end,
-    ): array
-    {
+    ): array {
         $interval = $intervalStr ?? 'hour';
-        switch($interval) {
+        switch ($interval) {
             case 'all':
                 return $this->aggregateTotalStats();
             case 'year':
@@ -67,24 +66,24 @@ class OAuth2ClientAccessRepository extends ServiceEntityRepository
     // Todo - stats need improvement for sure but that's out of the scope of making the starting API
     private function aggregateStats(string $interval, ?\DateTime $start, ?\DateTime $end): array
     {
-        if(null === $end) {
+        if (null === $end) {
             $end = new \DateTime();
         }
 
-        if(null == $start) {
+        if (null == $start) {
             $start = new \DateTime('-1 '.$interval);
         }
 
-        if($end < $start) {
+        if ($end < $start) {
             throw new \LogicException('End date must be after start date!');
         }
 
         $conn = $this->getEntityManager()->getConnection();
 
-        $sql = "SELECT c.name as client, date_trunc(?, e.created_at) as datetime, COUNT(e) as count FROM oauth2_client_access e
+        $sql = 'SELECT c.name as client, date_trunc(?, e.created_at) as datetime, COUNT(e) as count FROM oauth2_client_access e
                     JOIN oauth2_client c on c.identifier = e.client_id
                     WHERE e.created_at BETWEEN ? AND ?
-                    GROUP BY 1, 2 ORDER BY 3 DESC";
+                    GROUP BY 1, 2 ORDER BY 3 DESC';
 
         $stmt = $conn->prepare($sql);
         $stmt->bindValue(1, $interval);
@@ -98,8 +97,8 @@ class OAuth2ClientAccessRepository extends ServiceEntityRepository
     {
         $conn = $this->getEntityManager()->getConnection();
 
-        $sql = "SELECT e.client_id as client, COUNT(e) as count FROM oauth2_client_access e 
-                    GROUP BY 1 ORDER BY 2 DESC";
+        $sql = 'SELECT e.client_id as client, COUNT(e) as count FROM oauth2_client_access e 
+                    GROUP BY 1 ORDER BY 2 DESC';
 
         $stmt = $conn->prepare($sql);
 

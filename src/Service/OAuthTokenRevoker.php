@@ -6,16 +6,14 @@ use App\Entity\Client;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Bundle\OAuth2ServerBundle\Model\AccessToken;
-use League\Bundle\OAuth2ServerBundle\Model\RefreshToken;
 use League\Bundle\OAuth2ServerBundle\Model\AuthorizationCode;
+use League\Bundle\OAuth2ServerBundle\Model\RefreshToken;
 
 class OAuthTokenRevoker
 {
     public function __construct(
         private readonly EntityManagerInterface $entityManager
-    )
-    {
-        
+    ) {
     }
 
     public function revokeCredentialsForUserWithClient(User $user, Client $client): void

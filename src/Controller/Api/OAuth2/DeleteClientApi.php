@@ -52,8 +52,8 @@ class DeleteClientApi extends BaseApi
     #[OA\Tag(name: 'oauth')]
     /**
      * This endpoint deactivates a client given their client_id and client_secret.
-     * 
-     * This is useful if a confidential client has had their secret compromised and a 
+     *
+     * This is useful if a confidential client has had their secret compromised and a
      * new client needs to be created. A public client cannot be deleted in this manner
      * since it does not have a secret to be compromised
      */
@@ -65,25 +65,24 @@ class DeleteClientApi extends BaseApi
         ValidatorInterface $validator,
         SerializerInterface $serializer,
         RateLimiterFactory $apiOauthClientDeleteLimiter
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $headers = $this->rateLimit(anonLimiterFactory: $apiOauthClientDeleteLimiter);
 
         /** @var OAuth2ClientDto $dto */
-        $dto = $serializer->deserialize($request->getContent(), OAuth2ClientDto::class, 'json', ['groups' => ['deleting']]);        
-        
+        $dto = $serializer->deserialize($request->getContent(), OAuth2ClientDto::class, 'json', ['groups' => ['deleting']]);
+
         $validatorGroups = ['deleting'];
         $errors = $validator->validate($dto, groups: $validatorGroups);
-        if(0 < count($errors)) {
+        if (0 < count($errors)) {
             throw new BadRequestHttpException((string) $errors);
         }
 
         $client = $manager->find($dto->identifier);
-        if(null === $client || null === $client->getSecret()) {
+        if (null === $client || null === $client->getSecret()) {
             throw new BadRequestHttpException();
         }
 
-        if(!hash_equals($client->getSecret(), $dto->secret)) {
+        if (!hash_equals($client->getSecret(), $dto->secret)) {
             throw new BadRequestHttpException();
         }
 

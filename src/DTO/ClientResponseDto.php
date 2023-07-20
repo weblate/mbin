@@ -3,14 +3,13 @@
 namespace App\DTO;
 
 use App\Entity\Client;
-use JsonSerializable;
 use League\Bundle\OAuth2ServerBundle\ValueObject\Grant;
 use League\Bundle\OAuth2ServerBundle\ValueObject\RedirectUri;
 use League\Bundle\OAuth2ServerBundle\ValueObject\Scope;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema()]
-class ClientResponseDto implements JsonSerializable
+class ClientResponseDto implements \JsonSerializable
 {
     public ?string $identifier = null;
     public ?string $name = null;
@@ -28,7 +27,7 @@ class ClientResponseDto implements JsonSerializable
 
     public function __construct(?Client $client)
     {
-        if($client) {
+        if ($client) {
             $user = $client->getUser();
             $this->identifier = $client->getIdentifier();
             $this->name = $client->getName();
@@ -37,9 +36,9 @@ class ClientResponseDto implements JsonSerializable
             $this->user = $user ? new UserSmallResponseDto($user) : null;
             $this->active = $client->isActive();
             $this->createdAt = $client->getCreatedAt();
-            $this->redirectUris = array_map(fn (RedirectUri $uri) => (string)$uri, $client->getRedirectUris());
-            $this->grants = array_map(fn (Grant $grant) => (string)$grant, $client->getGrants());
-            $this->scopes = array_map(fn (Scope $scope) => (string)$scope, $client->getScopes());
+            $this->redirectUris = array_map(fn (RedirectUri $uri) => (string) $uri, $client->getRedirectUris());
+            $this->grants = array_map(fn (Grant $grant) => (string) $grant, $client->getGrants());
+            $this->scopes = array_map(fn (Scope $scope) => (string) $scope, $client->getScopes());
         }
     }
 

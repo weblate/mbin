@@ -72,12 +72,11 @@ class RetrieveClientApi extends BaseApi
     #[IsGranted('ROLE_ADMIN')]
     #[Security(name: 'oauth2', scopes: ['admin:oauth_clients:read'])]
     #[IsGranted('ROLE_OAUTH2_ADMIN:OAUTH_CLIENTS:READ')]
-    function __invoke(
+    public function __invoke(
         #[MapEntity(mapping: ['client_identifier' => 'identifier'])]
         Client $client,
         RateLimiterFactory $apiModerateLimiter,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $headers = $this->rateLimit($apiModerateLimiter);
 
         $dto = new ClientResponseDto($client);
@@ -96,7 +95,7 @@ class RetrieveClientApi extends BaseApi
             properties: [
                 new OA\Property(
                     property: 'items',
-                    type: 'array', 
+                    type: 'array',
                     items: new OA\Items(ref: new Model(type: ClientResponseDto::class))
                 ),
                 new OA\Property(
@@ -152,12 +151,11 @@ class RetrieveClientApi extends BaseApi
     #[IsGranted('ROLE_ADMIN')]
     #[Security(name: 'oauth2', scopes: ['admin:oauth_clients:read'])]
     #[IsGranted('ROLE_OAUTH2_ADMIN:OAUTH_CLIENTS:READ')]
-    function collection(
+    public function collection(
         EntityManagerInterface $manager,
         Request $request,
         RateLimiterFactory $apiModerateLimiter,
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $headers = $this->rateLimit($apiModerateLimiter);
 
         $page = $this->getPageNb($request);
@@ -182,7 +180,7 @@ class RetrieveClientApi extends BaseApi
         }
 
         $dtos = [];
-        foreach($pagerfanta->getCurrentPageResults() as $client) {
+        foreach ($pagerfanta->getCurrentPageResults() as $client) {
             assert($client instanceof Client);
             array_push($dtos, new ClientResponseDto($client));
         }

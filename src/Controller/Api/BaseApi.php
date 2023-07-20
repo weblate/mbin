@@ -32,10 +32,8 @@ use App\Service\IpResolver;
 use App\Service\ReportManager;
 use Doctrine\ORM\EntityManagerInterface;
 use League\Bundle\OAuth2ServerBundle\Security\Authentication\Token\OAuth2Token;
-use LogicException;
 use Pagerfanta\Pagerfanta;
 use Psr\Log\LoggerInterface;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
@@ -53,7 +51,7 @@ class BaseApi extends AbstractController
     public const MIN_DEPTH = 0;
     public const MAX_DEPTH = 25;
 
-    private static $constraint = null;
+    private static $constraint;
 
     public function __construct(
         protected readonly IpResolver $ipResolver,
@@ -69,30 +67,30 @@ class BaseApi extends AbstractController
     }
 
     /**
-     * Rate limit an API request and return rate limit status headers
-     * @param ?RateLimiterFactory $limiterFactory A limiter factory to use when the user is authenticated
+     * Rate limit an API request and return rate limit status headers.
+     *
+     * @param ?RateLimiterFactory $limiterFactory     A limiter factory to use when the user is authenticated
      * @param ?RateLimiterFactory $anonLimiterFactory A limiter factory to use when the user is anonymous
-     * 
+     *
      * @return array An array of headers describing the current rate limit status to the client
-     * 
-     * @throws AccessDeniedHttpException If the user is not authenticated and no anonymous rate limiter factory is provided, access to the resource will be denied.
+     *
+     * @throws AccessDeniedHttpException    if the user is not authenticated and no anonymous rate limiter factory is provided, access to the resource will be denied
      * @throws TooManyRequestsHttpException If the limit is hit, rate limit the connection
      */
     protected function rateLimit(
-        ?RateLimiterFactory $limiterFactory = null,
-        ?RateLimiterFactory $anonLimiterFactory = null
-    ): array
-    {
+        RateLimiterFactory $limiterFactory = null,
+        RateLimiterFactory $anonLimiterFactory = null
+    ): array {
         $this->logAccess();
-        if($limiterFactory === null && $anonLimiterFactory === null) {
-            throw new LogicException('No rate limiter factory provided!');
+        if (null === $limiterFactory && null === $anonLimiterFactory) {
+            throw new \LogicException('No rate limiter factory provided!');
         }
         $limiter = null;
-        if(
+        if (
             $this->isGranted('ROLE_USER')
-        ){
+        ) {
             $limiter = $limiterFactory->create($this->getUserOrThrow()->getUserIdentifier());
-        } else if($anonLimiterFactory) {
+        } elseif ($anonLimiterFactory) {
             $limiter = $anonLimiterFactory->create($this->ipResolver->resolve());
         } else {
             // non-API_USER without an anonymous rate limiter? Not allowed.
@@ -114,13 +112,14 @@ class BaseApi extends AbstractController
     }
 
     /**
-     * Logs timestamp, client, and route name of authenticated API access for admin 
-     * to track how API clients are being (ab)used and for stat creation
-     * 
+     * Logs timestamp, client, and route name of authenticated API access for admin
+     * to track how API clients are being (ab)used and for stat creation.
+     *
      * This might be better to have as a cache entry, with an aggregate in the database
      * created periodically
      */
-    private function logAccess() {
+    private function logAccess()
+    {
         /** @var ?OAuth2Token $token */
         $token = $this->container->get('security.token_storage')->getToken();
         if (null !== $token) {
@@ -133,13 +132,13 @@ class BaseApi extends AbstractController
             $access->setPath($this->request->getCurrentRequest()->get('_route'));
             $this->clientAccessRepository->save($access, flush: true);
         }
-    } 
+    }
 
     public function serializePaginated(array $serializedItems, Pagerfanta $pagerfanta): array
     {
         return [
             'items' => $serializedItems,
-            'pagination' => (new PaginationSchema($pagerfanta))->jsonSerialize()
+            'pagination' => (new PaginationSchema($pagerfanta))->jsonSerialize(),
         ];
     }
 
@@ -147,7 +146,7 @@ class BaseApi extends AbstractController
     {
         $toReturn = null;
         $className = $this->entityManager->getClassMetadata(get_class($content))->rootEntityName;
-        switch($className) {
+        switch ($className) {
             case Entry::class:
                 /**
                  * @var Entry $content
@@ -179,18 +178,19 @@ class BaseApi extends AbstractController
             default:
                 throw new \LogicException('Invalid contentInterface classname "'.$className.'"');
         }
+
         return $toReturn;
     }
 
     /**
-     * Serialize a single log item to JSON
-     * @param ?MagazineLog $dto The MagazineLog to serialize
-     * 
+     * Serialize a single log item to JSON.
+     *
      * @return array An associative array representation of the items's safe fields, to be used as JSON
      */
     protected function serializeLogItem(MagazineLog $log)
     {
         $response = new MagazineLogResponseDto($log);
+
         return $response->jsonSerialize();
     }
 
@@ -200,7 +200,7 @@ class BaseApi extends AbstractController
     }
 
     /**
-     * Alias for constrainPerPage with different defaults
+     * Alias for constrainPerPage with different defaults.
      */
     public static function constrainDepth(mixed $value, int $min = self::MIN_DEPTH, int $max = self::MAX_DEPTH): int
     {
@@ -211,14 +211,14 @@ class BaseApi extends AbstractController
     {
         $usePreferred = filter_var($this->request->getCurrentRequest()->get('usePreferredLangs', false), FILTER_VALIDATE_BOOL);
 
-        if($usePreferred && null === $this->getUser()) {
+        if ($usePreferred && null === $this->getUser()) {
             // Debating between AccessDenied and BadRequest exceptions for this
             throw new AccessDeniedHttpException('You must be logged in to use your preferred languages');
         }
-        
+
         $languages = $usePreferred ? $this->getUserOrThrow()->preferredLanguages : $this->request->getCurrentRequest()->get('lang');
-        if($languages !== null) {
-            if(is_string($languages)) {
+        if (null !== $languages) {
+            if (is_string($languages)) {
                 $languages = explode(',', $languages);
             }
 
@@ -234,32 +234,31 @@ class BaseApi extends AbstractController
              */
             $uploaded = $this->request->getCurrentRequest()->files->get('uploadImage');
 
-            if(null === self::$constraint) {
+            if (null === self::$constraint) {
                 self::$constraint = ImageConstraint::default();
             }
 
-            if(null === $uploaded) {
+            if (null === $uploaded) {
                 throw new BadRequestHttpException('Uploaded file not found!');
             }
 
-            if(self::$constraint->maxSize < $uploaded->getSize()) {
-                throw new BadRequestHttpException('File cannot exceed '.(string) self::$constraint->maxSize .' bytes');
+            if (self::$constraint->maxSize < $uploaded->getSize()) {
+                throw new BadRequestHttpException('File cannot exceed '.(string) self::$constraint->maxSize.' bytes');
             }
 
-            if(false === array_search($uploaded->getMimeType(), self::$constraint->mimeTypes)) {
-                throw new BadRequestHttpException('Mimetype of "'. $uploaded->getMimeType() .'" not allowed!');
+            if (false === array_search($uploaded->getMimeType(), self::$constraint->mimeTypes)) {
+                throw new BadRequestHttpException('Mimetype of "'.$uploaded->getMimeType().'" not allowed!');
             }
 
             $image = $this->imageRepository->findOrCreateFromUpload($uploaded);
 
-            if(null === $image) {
+            if (null === $image) {
                 throw new BadRequestHttpException('Failed to create file');
             }
 
             $image->altText = $this->request->getCurrentRequest()->get('alt', null);
-
-        } catch(\Exception $e) {
-            if(null !== $uploaded && file_exists($uploaded->getPathname())) {
+        } catch (\Exception $e) {
+            if (null !== $uploaded && file_exists($uploaded->getPathname())) {
                 unlink($uploaded->getPathname());
             }
             throw $e;
@@ -274,7 +273,7 @@ class BaseApi extends AbstractController
         $dto = $this->serializer->deserialize($this->request->getCurrentRequest()->getContent(), ReportRequestDto::class, 'json');
 
         $errors = $this->validator->validate($dto);
-        if(0 < count($errors)) {
+        if (0 < count($errors)) {
             throw new BadRequestHttpException((string) $errors);
         }
 
@@ -282,7 +281,7 @@ class BaseApi extends AbstractController
 
         try {
             $this->reportManager->report($reportDto, $this->getUserOrThrow());
-        } catch(SubjectHasBeenReportedException $e) {
+        } catch (SubjectHasBeenReportedException $e) {
             // Do nothing
         }
     }

@@ -4,12 +4,11 @@ declare(strict_types=1);
 
 namespace App\Schema;
 
-use JsonSerializable;
 use OpenApi\Attributes as OA;
 use Pagerfanta\Pagerfanta;
 
 #[OA\Schema()]
-class PaginationSchema implements JsonSerializable
+class PaginationSchema implements \JsonSerializable
 {
     #[OA\Property(description: 'The total number of items available')]
     public int $count = 0;

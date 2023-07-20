@@ -10,11 +10,11 @@ use App\Repository\OAuth2ClientAccessRepository;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
-use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class RetrieveClientStatsApi extends BaseApi
 {
@@ -24,10 +24,10 @@ class RetrieveClientStatsApi extends BaseApi
         content: new OA\JsonContent(
             properties: [
                 new OA\Property(
-                    'data', 
-                    type: 'array', 
+                    'data',
+                    type: 'array',
                     items: new OA\Items(ref: new Model(type: ClientAccessStatsResponseDto::class))
-                )
+                ),
             ]
         ),
         headers: [
@@ -85,48 +85,47 @@ class RetrieveClientStatsApi extends BaseApi
     #[Security(name: 'oauth2', scopes: ['admin:oauth_clients:read'])]
     #[IsGranted('ROLE_OAUTH2_ADMIN:OAUTH_CLIENTS:READ')]
     /**
-     * Retrieve oauth2 client access stats in a particular interval
+     * Retrieve oauth2 client access stats in a particular interval.
      */
     public function __invoke(
         Request $request,
         OAuth2ClientAccessRepository $repository,
         RateLimiterFactory $apiModerateLimiter
-    ): JsonResponse
-    {
+    ): JsonResponse {
         $headers = $this->rateLimit($apiModerateLimiter);
         $resolution = $request->get('resolution');
 
         try {
             $startString = $request->get('start');
-            if(null === $startString) {
+            if (null === $startString) {
                 $start = null;
             } else {
                 $start = new \DateTime($startString);
             }
 
             $endString = $request->get('end');
-            if(null === $endString) {
+            if (null === $endString) {
                 $end = null;
             } else {
                 $end = new \DateTime($endString);
             }
-        } catch(\Exception $e) {
+        } catch (\Exception $e) {
             throw new BadRequestHttpException('Failed to parse start or end time');
         }
 
-        if(null === $resolution) {
+        if (null === $resolution) {
             throw new BadRequestHttpException('Resolution must be provided!');
         }
 
         try {
             $stats = $repository->getStats($resolution, $start, $end);
-        } catch(\LogicException $e) {
+        } catch (\LogicException $e) {
             throw new BadRequestHttpException($e->getMessage());
         }
 
         return new JsonResponse(
             [
-                'data' => $stats
+                'data' => $stats,
             ],
             headers: $headers
         );
