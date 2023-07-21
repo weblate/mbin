@@ -379,6 +379,11 @@
 
       .btn {
         width: 100%;
+        display: flex;
+        gap: .5rem;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
 
         &:hover {
           color: var(--kbin-button-secondary-text-hover-color);
