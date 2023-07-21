@@ -4,6 +4,98 @@ nelmio_api_doc:
             title: /kbin API
             description: Documentation for interacting with content on /kbin through the API
             version: 0.1.0
+        paths:
+            /authorize:
+                get:
+                    tags:
+                        - oauth
+                    summary: Begin an oauth2 authorization_code grant flow
+                    parameters:
+                        - name: response_type
+                          in: query
+                          schema:
+                            type: string
+                            default: code
+                            enum:
+                                - code
+                          required: true
+                        - name: client_id
+                          in: query
+                          schema:
+                            type: string
+                          required: true
+                        - name: redirect_uri
+                          in: query
+                          description: One of the valid redirect_uris that were registered for your client during client creation.
+                          schema:
+                            type: string
+                            format: uri
+                          required: true
+                        - name: scope
+                          in: query
+                          description: A space delimited list of requested scopes
+                          schema:
+                            type: string
+                          required: true
+                        - name: state
+                          in: query
+                          description: A randomly generated state variable to be used to prevent CSRF attacks
+                          schema:
+                            type: string
+                          required: true
+                        - name: code_challenge
+                          in: query
+                          description: Required for public clients, begins PKCE flow when present
+                          schema:
+                            type: string
+                        - name: code_challenge_method
+                          in: query
+                          description: Required for public clients, sets the type of code challenge used
+                          schema:
+                            type: string
+                            enum:
+                                - S256
+                                - plain
+            /token:
+                post:
+                    tags:
+                        - oauth
+                    summary: Used to retrieve a Bearer token after recieving consent from the user
+                    requestBody:
+                        content:
+                            multipart/form-data:
+                                schema:
+                                    required:
+                                      - grant_type
+                                      - client_id
+                                    properties:
+                                        grant_type:
+                                            type: string
+                                            description: One of the three grant types available
+                                            enum:
+                                                - authorization_code
+                                                - refresh_token
+                                                - client_credentials
+                                        client_id:
+                                            type: string
+                                        client_secret:
+                                            type: string
+                                            description: Required if using the client_credentials or authorization_code flow with a confidential client
+                                        code_verifier:
+                                            type: string
+                                            description: Required if using the PKCE extension to authorization_code flow
+                                        code:
+                                            type: string
+                                            description: Required during authorization_code flow. The code retrieved after redirect during authorization_code flow.
+                                        refresh_token:
+                                            type: string
+                                            description: Required during refresh_token flow. This is the refresh token obtained after a successful authorization_code flow.
+                                        redirect_uri:
+                                            type: string
+                                            description: Required during authorization_code flow. One of the valid redirect_uris that were registered for your client during client creation.
+                                        scope:
+                                            type: string
+                                            description: Required during client_credentials flow. A space-delimited list of scopes the client token will be provided.
         components:
             securitySchemes:
                 oauth2:
