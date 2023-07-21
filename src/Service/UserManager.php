@@ -127,9 +127,9 @@ class UserManager
         $this->dispatcher->dispatch(new UserFollowEvent($follower, $following, true));
     }
 
-    public function create(UserDto $dto, bool $verifyUserEmail = true, $limiter = true): User
+    public function create(UserDto $dto, bool $verifyUserEmail = true, $rateLimit = true): User
     {
-        if ($limiter) {
+        if ($rateLimit) {
             $limiter = $this->userRegisterLimiter->create($dto->ip);
             if (false === $limiter->consume()->isAccepted()) {
                 throw new TooManyRequestsHttpException();
