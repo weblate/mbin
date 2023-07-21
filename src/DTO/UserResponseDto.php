@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\Entity\Image;
 use App\Entity\User;
 use OpenApi\Attributes as OA;
 
@@ -26,8 +27,16 @@ class UserResponseDto implements \JsonSerializable
         $this->userId = $dto->getId();
         $this->username = $dto->username;
         $this->about = $dto->about;
-        $this->avatar = $dto->avatar;
-        $this->cover = $dto->cover;
+        if($dto->avatar instanceof Image) {
+            $this->avatar = new ImageDto($dto->avatar);
+        } else {
+            $this->avatar = $dto->avatar;
+        }
+        if($dto->cover instanceof Image) {
+            $this->cover = new ImageDto($dto->cover);
+        } else {
+            $this->cover = $dto->cover;
+        }
         $this->lastActive = $dto->lastActive;
         $this->apId = $dto->apId;
         $this->apProfileId = $dto->apProfileId;
