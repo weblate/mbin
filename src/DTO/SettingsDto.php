@@ -9,7 +9,7 @@ use OpenApi\Attributes as OA;
 #[OA\Schema()]
 class SettingsDto implements \JsonSerializable
 {
-     public function __construct(
+    public function __construct(
         public string $KBIN_DOMAIN,
         public string $KBIN_TITLE,
         public string $KBIN_META_TITLE,

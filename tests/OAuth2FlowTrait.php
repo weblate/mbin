@@ -27,7 +27,7 @@ trait OAuth2FlowTrait
         $client->submit(
             $crawler->selectButton('consent')->form(
                 [
-                    'consent' => $consent
+                    'consent' => $consent,
                 ]
             )
         );
@@ -74,6 +74,7 @@ trait OAuth2FlowTrait
         $response = $client->getResponse();
 
         self::assertJson($response->getContent());
+
         return json_decode($response->getContent(), associative: true);
     }
 }
