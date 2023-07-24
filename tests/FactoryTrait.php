@@ -118,6 +118,21 @@ trait FactoryTrait
         $manager->save($client);
     }
 
+    public static function createOAuth2PublicAuthCodeClient(): void
+    {
+        /** @var ClientManagerInterface $manager */
+        $manager = self::getContainer()->get(ClientManagerInterface::class);
+
+        $client = new Client('/kbin Test Client', 'testpublicclient', null);
+        $client->setDescription('An OAuth2 public client for testing purposes');
+        $client->setContactEmail('test@kbin.test');
+        $client->setScopes(...array_map(fn (string $scope) => new Scope($scope), OAuth2ClientDto::AVAILABLE_SCOPES));
+        $client->setGrants(new Grant('authorization_code'), new Grant('refresh_token'));
+        $client->setRedirectUris(new RedirectUri('https://localhost:3001'));
+
+        $manager->save($client);
+    }
+
     public static function createOAuth2ClientCredsClient(): void
     {
         /** @var ClientManagerInterface $clientManager */
