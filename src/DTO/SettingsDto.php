@@ -9,41 +9,24 @@ use OpenApi\Attributes as OA;
 #[OA\Schema()]
 class SettingsDto implements \JsonSerializable
 {
-    public ?string $KBIN_DOMAIN = null;
-    public ?string $KBIN_TITLE = null;
-    public ?string $KBIN_META_TITLE = null;
-    public ?string $KBIN_META_KEYWORDS = null;
-    public ?string $KBIN_META_DESCRIPTION = null;
-    public ?string $KBIN_DEFAULT_LANG = null;
-    public ?string $KBIN_CONTACT_EMAIL = null;
-    public ?string $KBIN_SENDER_EMAIL = null;
-    public ?bool $KBIN_JS_ENABLED = null;
-    public ?bool $KBIN_FEDERATION_ENABLED = null;
-    public ?bool $KBIN_REGISTRATIONS_ENABLED = null;
-    #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
-    public ?array $KBIN_BANNED_INSTANCES = null;
-    public ?bool $KBIN_HEADER_LOGO = null;
-    public ?bool $KBIN_CAPTCHA_ENABLED = null;
-    public ?bool $KBIN_MERCURE_ENABLED = null;
-    public ?bool $KBIN_ADMIN_ONLY_OAUTH_CLIENTS = null;
-
-    public function __construct(
-        string $KBIN_DOMAIN,
-        string $KBIN_TITLE,
-        string $KBIN_META_TITLE,
-        string $KBIN_META_KEYWORDS,
-        string $KBIN_META_DESCRIPTION,
-        string $KBIN_DEFAULT_LANG,
-        string $KBIN_CONTACT_EMAIL,
-        string $KBIN_SENDER_EMAIL,
-        bool $KBIN_JS_ENABLED,
-        bool $KBIN_FEDERATION_ENABLED,
-        bool $KBIN_REGISTRATIONS_ENABLED,
-        array $KBIN_BANNED_INSTANCES,
-        bool $KBIN_HEADER_LOGO,
-        bool $KBIN_CAPTCHA_ENABLED,
-        bool $KBIN_MERCURE_ENABLED,
-        bool $KBIN_ADMIN_ONLY_OAUTH_CLIENTS
+     public function __construct(
+        public string $KBIN_DOMAIN,
+        public string $KBIN_TITLE,
+        public string $KBIN_META_TITLE,
+        public string $KBIN_META_KEYWORDS,
+        public string $KBIN_META_DESCRIPTION,
+        public string $KBIN_DEFAULT_LANG,
+        public string $KBIN_CONTACT_EMAIL,
+        public string $KBIN_SENDER_EMAIL,
+        public bool $KBIN_JS_ENABLED,
+        public bool $KBIN_FEDERATION_ENABLED,
+        public bool $KBIN_REGISTRATIONS_ENABLED,
+        #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
+        public array $KBIN_BANNED_INSTANCES,
+        public bool $KBIN_HEADER_LOGO,
+        public bool $KBIN_CAPTCHA_ENABLED,
+        public bool $KBIN_MERCURE_ENABLED,
+        public bool $KBIN_ADMIN_ONLY_OAUTH_CLIENTS
     ) {
         $this->KBIN_DOMAIN = $KBIN_DOMAIN;
         $this->KBIN_TITLE = $KBIN_TITLE;

@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 abstract class WebTestCase extends BaseWebTestCase
 {
     use FactoryTrait;
+    use OAuth2FlowTrait;
 
     protected ArrayCollection $users;
     protected ArrayCollection $magazines;

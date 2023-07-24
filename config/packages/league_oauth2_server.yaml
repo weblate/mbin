@@ -139,4 +139,5 @@ league_oauth2_server:
 when@test:
     league_oauth2_server:
         persistence:
-            in_memory: null
+            doctrine:
+                entity_manager: default
