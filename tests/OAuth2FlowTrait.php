@@ -29,9 +29,9 @@ trait OAuth2FlowTrait
         );
     }
 
-    protected static function runAuthorizationCodeFlowToConsentPage(KernelBrowser $client, string $scopes, string $state, string $clientId = 'testclient', string $redirectUri = 'https://localhost:3001'): void
+    protected static function runAuthorizationCodeFlowToConsentPage(KernelBrowser $client, string $scopes, string $state, string $clientId = 'testclient', string $redirectToUri = 'https://localhost:3001'): void
     {
-        $query = self::buildPrivateAuthCodeQuery($clientId, $scopes, $state, $redirectUri);
+        $query = self::buildPrivateAuthCodeQuery($clientId, $scopes, $state, $redirectToUri);
 
         $uri = '/authorize?'.$query;
 
@@ -66,10 +66,10 @@ trait OAuth2FlowTrait
         self::assertResponseRedirects();
     }
 
-    public static function runAuthorizationCodeFlow(KernelBrowser $client, string $consent = 'yes', string $scopes = 'read write', string $state = 'oauth2state', string $clientId = 'testclient'): void
+    public static function runAuthorizationCodeFlow(KernelBrowser $client, string $consent = 'yes', string $scopes = 'read write', string $state = 'oauth2state', string $clientId = 'testclient', string $redirectUri = 'https://localhost:3001'): void
     {
-        self::runAuthorizationCodeFlowToConsentPage($client, $scopes, $state, $clientId);
-        self::runAuthorizationCodeFlowToRedirectUri($client, $scopes, $consent, $state, $clientId);
+        self::runAuthorizationCodeFlowToConsentPage($client, $scopes, $state, $clientId, $redirectUri);
+        self::runAuthorizationCodeFlowToRedirectUri($client, $scopes, $consent, $state, $clientId, $redirectUri);
     }
 
     private const VERIFIER_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
@@ -157,7 +157,7 @@ trait OAuth2FlowTrait
 
     public static function getAuthorizationCodeTokenResponse(KernelBrowser $client, string $clientId = 'testclient', string $clientSecret = 'testsecret', string $redirectUri = 'https://localhost:3001', string $scopes = 'read write'): array
     {
-        self::runAuthorizationCodeFlow($client, 'yes', $scopes);
+        self::runAuthorizationCodeFlow($client, 'yes', $scopes, clientId: $clientId, redirectUri: $redirectUri);
 
         $response = $client->getResponse();
         $parsedUrl = parse_url($response->headers->get('Location'));
