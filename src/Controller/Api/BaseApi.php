@@ -87,7 +87,7 @@ class BaseApi extends AbstractController
         }
         $limiter = null;
         if (
-            $this->isGranted('ROLE_USER')
+            $limiterFactory && $this->isGranted('ROLE_USER')
         ) {
             $limiter = $limiterFactory->create($this->getUserOrThrow()->getUserIdentifier());
         } elseif ($anonLimiterFactory) {
@@ -122,7 +122,7 @@ class BaseApi extends AbstractController
     {
         /** @var ?OAuth2Token $token */
         $token = $this->container->get('security.token_storage')->getToken();
-        if (null !== $token) {
+        if (null !== $token && $token instanceof OAuth2Token) {
             $clientId = $token->getOAuthClientId();
             /** @var Client $client */
             $client = $this->entityManager->getReference(Client::class, $clientId);
