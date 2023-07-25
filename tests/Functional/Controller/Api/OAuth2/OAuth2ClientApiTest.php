@@ -17,7 +17,7 @@ class OAuth2ClientApiTest extends WebTestCase
             'description' => 'An OAuth2 client for testing purposes, created via the API',
             'contactEmail' => 'test@kbin.test',
             'redirectUris' => [
-                'https://localhost:3002'
+                'https://localhost:3002',
             ],
             'grants' => [
                 'authorization_code',
