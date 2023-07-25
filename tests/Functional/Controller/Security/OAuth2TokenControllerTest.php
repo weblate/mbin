@@ -55,6 +55,31 @@ class OAuth2TokenControllerTest extends WebTestCase
         self::assertMatchesRegularExpression(self::CODE_REGEX, $jsonData['refresh_token']);
     }
 
+    public function testCanGetTokenWithValidRefreshToken(): void
+    {
+        $client = self::createClient();
+        $client->loginUser($this->getUserByUsername('JohnDoe'));
+        self::createOAuth2AuthCodeClient();
+
+        $jsonData = self::getAuthorizationCodeTokenResponse($client);
+
+        self::assertResponseIsSuccessful();
+        self::assertIsArray($jsonData);
+        self::assertArrayHasKey('refresh_token', $jsonData);
+
+        $jsonData = self::getRefreshTokenResponse($client, $jsonData['refresh_token']);
+        self::assertResponseIsSuccessful();
+        self::assertIsArray($jsonData);
+        self::assertArrayHasKey('token_type', $jsonData);
+        self::assertEquals('Bearer', $jsonData['token_type']);
+        self::assertArrayHasKey('expires_in', $jsonData);
+        self::assertIsInt($jsonData['expires_in']);
+        self::assertArrayHasKey('access_token', $jsonData);
+        self::assertMatchesRegularExpression(self::JWT_REGEX, $jsonData['access_token']);
+        self::assertArrayHasKey('refresh_token', $jsonData);
+        self::assertMatchesRegularExpression(self::CODE_REGEX, $jsonData['refresh_token']);
+    }
+
     public function testCanGetTokenWithValidAuthorizationCodePKCE(): void
     {
         $client = self::createClient();
@@ -162,7 +187,16 @@ class OAuth2TokenControllerTest extends WebTestCase
         $client->loginUser($this->getUserByUsername('JohnDoe'));
         self::createOAuth2AuthCodeClient();
 
-        $jsonData = self::getAuthorizationCodeTokenResponse($client, clientId: 'testclientfake');
+        $query = self::buildPrivateAuthCodeQuery('testclientfake', 'read write', 'oauth2state', 'https://localhost:3001');
+
+        $uri = '/authorize?'.$query;
+
+        $client->request('GET', $uri);
+        $response = $client->getResponse();
+
+        self::assertJson($response->getContent());
+
+        $jsonData = json_decode($response->getContent(), associative: true);
 
         self::assertResponseStatusCodeSame(401);
 
@@ -196,7 +230,16 @@ class OAuth2TokenControllerTest extends WebTestCase
         $client->loginUser($this->getUserByUsername('JohnDoe'));
         self::createOAuth2AuthCodeClient();
 
-        $jsonData = self::getAuthorizationCodeTokenResponse($client, redirectUri: 'https://invalid.com');
+        $query = self::buildPrivateAuthCodeQuery('testclient', 'read write', 'oauth2state', 'https://invalid.com');
+
+        $uri = '/authorize?'.$query;
+
+        $client->request('GET', $uri);
+        $response = $client->getResponse();
+
+        self::assertJson($response->getContent());
+
+        $jsonData = json_decode($response->getContent(), associative: true);
 
         self::assertResponseStatusCodeSame(401);
 

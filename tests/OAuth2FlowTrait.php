@@ -185,6 +185,22 @@ trait OAuth2FlowTrait
         return json_decode($response->getContent(), associative: true);
     }
 
+    public static function getRefreshTokenResponse(KernelBrowser $client, string $refreshToken, string $clientId = 'testclient', string $clientSecret = 'testsecret', string $redirectUri = 'https://localhost:3001', string $scopes = 'read write'): array
+    {
+        $client->request('POST', '/token', [
+            'grant_type' => 'refresh_token',
+            'client_id' => $clientId,
+            'client_secret' => $clientSecret,
+            'refresh_token' => $refreshToken,
+        ]);
+
+        $response = $client->getResponse();
+
+        self::assertJson($response->getContent());
+
+        return json_decode($response->getContent(), associative: true);
+    }
+
     public static function runPublicAuthorizationCodeTokenFetch(KernelBrowser $client, string $verifier, string $clientId = 'testpublicclient', string $redirectUri = 'https://localhost:3001'): void
     {
         $response = $client->getResponse();
