@@ -11,9 +11,6 @@ tools/vendor/
 .vscode/
 *.session.sql
 
-# Caddy
-Caddyfile*
-
 # Keys
 *.pem
 
