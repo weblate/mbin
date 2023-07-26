@@ -14,16 +14,6 @@ tools/vendor/
 # Keys
 *.pem
 
-# VSCode
-.vscode/
-*.session.sql
-
-# Caddy
-Caddyfile*
-
-# Keys
-*.pem
-
 ###> symfony/framework-bundle ###
 /.env.local
 /.env.local.php
