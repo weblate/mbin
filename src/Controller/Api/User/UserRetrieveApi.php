@@ -280,6 +280,7 @@ class UserRetrieveApi extends UserBaseApi
     #[OA\Tag(name: 'user')]
     public function collection(
         UserRepository $userRepository,
+        UserFactory $userFactory,
         Request $request,
         RateLimiterFactory $apiReadLimiter,
         RateLimiterFactory $anonymousApiReadLimiter
@@ -296,8 +297,8 @@ class UserRetrieveApi extends UserBaseApi
 
         $dtos = [];
         foreach ($users->getCurrentPageResults() as $value) {
-            assert($value instanceof UserDto);
-            array_push($dtos, $this->serializeUser($value));
+            assert($value instanceof User);
+            array_push($dtos, $this->serializeUser($userFactory->createDto($value)));
         }
 
         return new JsonResponse(

@@ -10,39 +10,24 @@ use OpenApi\Attributes as OA;
 #[OA\Schema()]
 class UserSettingsDto implements \JsonSerializable
 {
-    public ?bool $notifyOnNewEntry = null;
-    public ?bool $notifyOnNewEntryReply = null;
-    public ?bool $notifyOnNewEntryCommentReply = null;
-    public ?bool $notifyOnNewPost = null;
-    public ?bool $notifyOnNewPostReply = null;
-    public ?bool $notifyOnNewPostCommentReply = null;
-    public ?bool $hideAdult = null;
-    public ?bool $showProfileSubscriptions = null;
-    public ?bool $showProfileFollowings = null;
-    public ?bool $addMentionsEntries = null;
-    public ?bool $addMentionsPosts = null;
-    #[OA\Property(type: 'string', enum: User::HOMEPAGE_OPTIONS)]
-    public ?string $homepage = null;
-    #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
-    public ?array $featuredMagazines = null;
-    #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
-    public ?array $preferredLanguages = null;
-
     public function __construct(
-        bool $notifyOnNewEntry = false,
-        bool $notifyOnNewEntryReply = false,
-        bool $notifyOnNewEntryCommentReply = true,
-        bool $notifyOnNewPost = false,
-        bool $notifyOnNewPostReply = false,
-        bool $notifyOnNewPostCommentReply = true,
-        bool $hideAdult = false,
-        bool $showProfileSubscriptions = true,
-        bool $showProfileFollowings = true,
-        bool $addMentionsEntries = true,
-        bool $addMentionsPosts = true,
-        string $homepage = User::HOMEPAGE_SUB,
-        array $featuredMagazines = null,
-        array $preferredLanguages = null,
+        public ?bool $notifyOnNewEntry = null,
+        public ?bool $notifyOnNewEntryReply = null,
+        public ?bool $notifyOnNewEntryCommentReply = null,
+        public ?bool $notifyOnNewPost = null,
+        public ?bool $notifyOnNewPostReply = null,
+        public ?bool $notifyOnNewPostCommentReply = null,
+        public ?bool $hideAdult = null,
+        public ?bool $showProfileSubscriptions = null,
+        public ?bool $showProfileFollowings = null,
+        public ?bool $addMentionsEntries = null,
+        public ?bool $addMentionsPosts = null,
+        #[OA\Property(type: 'string', enum: User::HOMEPAGE_OPTIONS)]
+        public ?string $homepage = null,
+        #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
+        public ?array $featuredMagazines = null,
+        #[OA\Property(type: 'array', items: new OA\Items(type: 'string'))]
+        public ?array $preferredLanguages = null,
     ) {
         $this->notifyOnNewEntry = $notifyOnNewEntry;
         $this->notifyOnNewEntryReply = $notifyOnNewEntryReply;
