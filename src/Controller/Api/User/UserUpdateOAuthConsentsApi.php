@@ -7,6 +7,7 @@ namespace App\Controller\Api\User;
 use App\DTO\ClientConsentsRequestDto;
 use App\DTO\ClientConsentsResponseDto;
 use App\Entity\OAuth2UserConsent;
+use App\Factory\ClientConsentsFactory;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
@@ -76,6 +77,7 @@ class UserUpdateOAuthConsentsApi extends UserBaseApi
     public function __invoke(
         #[MapEntity(id: 'consent_id')]
         OAuth2UserConsent $consent,
+        ClientConsentsFactory $factory,
         Request $request,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
@@ -99,7 +101,7 @@ class UserUpdateOAuthConsentsApi extends UserBaseApi
         $this->entityManager->flush();
 
         return new JsonResponse(
-            (new ClientConsentsResponseDto($consent))->jsonSerialize(),
+            $factory->createDto($consent)->jsonSerialize(),
             headers: $headers
         );
     }

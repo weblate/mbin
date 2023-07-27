@@ -10,6 +10,7 @@ use App\DTO\UserResponseDto;
 use App\DTO\UserSettingsDto;
 use App\Entity\User;
 use App\Entity\UserBlock;
+use App\Entity\UserFollow;
 use App\Factory\UserFactory;
 use App\Repository\UserRepository;
 use App\Schema\PaginationSchema;
@@ -378,6 +379,7 @@ class UserRetrieveApi extends UserBaseApi
         #[MapEntity(id: 'user_id')]
         User $user,
         UserRepository $repository,
+        UserFactory $factory,
         Request $request,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
@@ -395,7 +397,8 @@ class UserRetrieveApi extends UserBaseApi
 
         $dtos = [];
         foreach ($users->getCurrentPageResults() as $value) {
-            array_push($dtos, $this->serializeUser($value->following));
+            assert($value instanceof UserFollow);
+            array_push($dtos, $this->serializeUser($factory->createDto($value->following)));
         }
 
         return new JsonResponse(
@@ -472,6 +475,7 @@ class UserRetrieveApi extends UserBaseApi
         #[MapEntity(id: 'user_id')]
         User $user,
         UserRepository $repository,
+        UserFactory $factory,
         Request $request,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
@@ -485,7 +489,8 @@ class UserRetrieveApi extends UserBaseApi
 
         $dtos = [];
         foreach ($users->getCurrentPageResults() as $value) {
-            array_push($dtos, $this->serializeUser($value->follower));
+            assert($value instanceof UserFollow);
+            array_push($dtos, $this->serializeUser($factory->createDto($value->follower)));
         }
 
         return new JsonResponse(
@@ -549,6 +554,7 @@ class UserRetrieveApi extends UserBaseApi
     #[IsGranted('ROLE_OAUTH2_USER:BLOCK')]
     public function blocked(
         UserRepository $repository,
+        UserFactory $factory,
         Request $request,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
@@ -563,7 +569,7 @@ class UserRetrieveApi extends UserBaseApi
         $dtos = [];
         foreach ($users->getCurrentPageResults() as $value) {
             assert($value instanceof UserBlock);
-            array_push($dtos, $this->serializeUser($value->blocked));
+            array_push($dtos, $this->serializeUser($factory->createDto($value->blocked)));
         }
 
         return new JsonResponse(

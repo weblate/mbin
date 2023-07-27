@@ -7,6 +7,7 @@ namespace App\Controller\Api\User\Admin;
 use App\Controller\Api\User\UserBaseApi;
 use App\DTO\UserResponseDto;
 use App\Entity\User;
+use App\Factory\UserFactory;
 use App\Service\UserManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -71,6 +72,7 @@ class UserDeleteApi extends UserBaseApi
         #[MapEntity(id: 'user_id')]
         User $user,
         UserManager $manager,
+        UserFactory $factory,
         RateLimiterFactory $apiModerateLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiModerateLimiter);
@@ -78,7 +80,7 @@ class UserDeleteApi extends UserBaseApi
         $manager->delete($user);
 
         return new JsonResponse(
-            $this->serializeUser($user),
+            $this->serializeUser($factory->createDto($user)),
             headers: $headers
         );
     }

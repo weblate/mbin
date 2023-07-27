@@ -7,6 +7,7 @@ namespace App\Controller\Api\User\Admin;
 use App\Controller\Api\User\UserBaseApi;
 use App\DTO\UserResponseDto;
 use App\Entity\User;
+use App\Factory\UserFactory;
 use App\Service\UserManager;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -68,6 +69,7 @@ class UserBanApi extends UserBaseApi
         #[MapEntity(id: 'user_id')]
         User $user,
         UserManager $manager,
+        UserFactory $factory,
         RateLimiterFactory $apiModerateLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiModerateLimiter);
@@ -75,7 +77,7 @@ class UserBanApi extends UserBaseApi
         $manager->ban($user);
 
         return new JsonResponse(
-            $this->serializeUser($user),
+            $this->serializeUser($factory->createDto($user)),
             headers: $headers
         );
     }
@@ -130,6 +132,7 @@ class UserBanApi extends UserBaseApi
         #[MapEntity(id: 'user_id')]
         User $user,
         UserManager $manager,
+        UserFactory $factory,
         RateLimiterFactory $apiModerateLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiModerateLimiter);
@@ -137,7 +140,7 @@ class UserBanApi extends UserBaseApi
         $manager->unban($user);
 
         return new JsonResponse(
-            $this->serializeUser($user),
+            $this->serializeUser($factory->createDto($user)),
             headers: $headers
         );
     }

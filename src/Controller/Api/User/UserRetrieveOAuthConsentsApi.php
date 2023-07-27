@@ -6,6 +6,7 @@ namespace App\Controller\Api\User;
 
 use App\DTO\ClientConsentsResponseDto;
 use App\Entity\OAuth2UserConsent;
+use App\Factory\ClientConsentsFactory;
 use App\Schema\PaginationSchema;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -72,12 +73,13 @@ class UserRetrieveOAuthConsentsApi extends UserBaseApi
     public function __invoke(
         #[MapEntity(id: 'consent_id')]
         OAuth2UserConsent $consent,
+        ClientConsentsFactory $factory,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiReadLimiter);
 
         return new JsonResponse(
-            (new ClientConsentsResponseDto($consent))->jsonSerialize(),
+            $factory->createDto($consent)->jsonSerialize(),
             headers: $headers
         );
     }
@@ -147,6 +149,7 @@ class UserRetrieveOAuthConsentsApi extends UserBaseApi
     #[IsGranted('ROLE_OAUTH2_USER:OAUTH_CLIENTS:READ')]
     public function collection(
         Request $request,
+        ClientConsentsFactory $factory,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiReadLimiter);
@@ -170,7 +173,7 @@ class UserRetrieveOAuthConsentsApi extends UserBaseApi
         $dtos = [];
         foreach ($pagerfanta->getCurrentPageResults() as $consent) {
             assert($consent instanceof OAuth2UserConsent);
-            array_push($dtos, (new ClientConsentsResponseDto($consent))->jsonSerialize());
+            array_push($dtos, $factory->createDto($consent)->jsonSerialize());
         }
 
         return new JsonResponse(

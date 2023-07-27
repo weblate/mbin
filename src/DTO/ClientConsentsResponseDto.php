@@ -2,8 +2,6 @@
 
 namespace App\DTO;
 
-use App\Entity\OAuth2UserConsent;
-use League\Bundle\OAuth2ServerBundle\ValueObject\Scope;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema()]
@@ -18,16 +16,17 @@ class ClientConsentsResponseDto implements \JsonSerializable
     #[OA\Property(description: 'The scopes the app may request', type: 'array', items: new OA\Items(type: 'string', enum: OAuth2ClientDto::AVAILABLE_SCOPES))]
     public ?array $scopesAvailable = null;
 
-    public function __construct(?OAuth2UserConsent $consent)
+    public static function create(int $consentId, string $clientName, ?string $clientDescription, ?ImageDto $logo, array $scopesGranted, array $scopesAvailable): self
     {
-        if ($consent) {
-            $this->consentId = $consent->getId();
-            $this->client = $consent->getClient()->getName();
-            $this->description = $consent->getClient()->getDescription();
-            $this->clientLogo = $consent->getClient()->getImage() ? new ImageDto($consent->getClient()->getImage()) : null;
-            $this->scopesGranted = $consent->getScopes();
-            $this->scopesAvailable = array_map(fn (Scope $scope) => (string) $scope, $consent->getClient()->getScopes());
-        }
+        $toReturn = new ClientConsentsResponseDto();
+        $toReturn->consentId = $consentId;
+        $toReturn->client = $clientName;
+        $toReturn->description = $clientDescription;
+        $toReturn->clientLogo = $logo;
+        $toReturn->scopesGranted = $scopesGranted;
+        $toReturn->scopesAvailable = $scopesAvailable;
+
+        return $toReturn;
     }
 
     public function jsonSerialize(): mixed

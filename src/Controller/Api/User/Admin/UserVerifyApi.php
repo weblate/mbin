@@ -7,6 +7,7 @@ namespace App\Controller\Api\User\Admin;
 use App\Controller\Api\User\UserBaseApi;
 use App\DTO\UserResponseDto;
 use App\Entity\User;
+use App\Factory\UserFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
@@ -68,6 +69,7 @@ class UserVerifyApi extends UserBaseApi
         #[MapEntity(id: 'user_id')]
         User $user,
         EntityManagerInterface $manager,
+        UserFactory $factory,
         RateLimiterFactory $apiModerateLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiModerateLimiter);
@@ -77,7 +79,7 @@ class UserVerifyApi extends UserBaseApi
         $manager->persist($user);
         $manager->flush();
 
-        $response = $this->serializeUser($user);
+        $response = $this->serializeUser($factory->createDto($user));
         $response['isVerified'] = $user->isVerified;
 
         return new JsonResponse(

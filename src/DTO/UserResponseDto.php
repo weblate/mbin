@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
-use App\Entity\Image;
-use App\Entity\User;
 use OpenApi\Attributes as OA;
 
 #[OA\Schema()]
@@ -22,21 +20,13 @@ class UserResponseDto implements \JsonSerializable
     public ?bool $isBot = null;
     public ?int $userId = null;
 
-    public function __construct(UserDto|User $dto)
+    public function __construct(UserDto $dto)
     {
         $this->userId = $dto->getId();
         $this->username = $dto->username;
         $this->about = $dto->about;
-        if($dto->avatar instanceof Image) {
-            $this->avatar = new ImageDto($dto->avatar);
-        } else {
-            $this->avatar = $dto->avatar;
-        }
-        if($dto->cover instanceof Image) {
-            $this->cover = new ImageDto($dto->cover);
-        } else {
-            $this->cover = $dto->cover;
-        }
+        $this->avatar = $dto->avatar;
+        $this->cover = $dto->cover;
         $this->lastActive = $dto->lastActive;
         $this->apId = $dto->apId;
         $this->apProfileId = $dto->apProfileId;
@@ -50,8 +40,8 @@ class UserResponseDto implements \JsonSerializable
             'userId' => $this->userId,
             'username' => $this->username,
             'about' => $this->about,
-            'avatar' => $this->avatar ? $this->avatar->jsonSerialize() : null,
-            'cover' => $this->cover ? $this->cover->jsonSerialize() : null,
+            'avatar' => $this->avatar?->jsonSerialize(),
+            'cover' => $this->cover?->jsonSerialize(),
             'lastActive' => $this->lastActive?->format(\DateTimeInterface::ATOM),
             'followersCount' => $this->followersCount,
             'apId' => $this->apId,
