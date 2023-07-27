@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Controller\Api\User;
 
 use App\Controller\Traits\PrivateContentTrait;
-use App\DTO\UserDto;
 use App\DTO\UserResponseDto;
 use App\DTO\UserSettingsDto;
 use App\Entity\User;

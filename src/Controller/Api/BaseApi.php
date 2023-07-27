@@ -57,7 +57,7 @@ class BaseApi extends AbstractController
     public const MIN_DEPTH = 0;
     public const MAX_DEPTH = 25;
 
-    private static $constraint = null;
+    private static $constraint;
 
     public function __construct(
         protected readonly IpResolver $ipResolver,
