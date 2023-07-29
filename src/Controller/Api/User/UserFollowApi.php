@@ -57,7 +57,7 @@ class UserFollowApi extends UserBaseApi
     #[OA\Parameter(
         name: 'user_id',
         in: 'path',
-        description: 'The user to (un)subscribe to/from',
+        description: 'The user to follow',
         schema: new OA\Schema(type: 'integer'),
     )]
     #[OA\Tag(name: 'user')]
@@ -123,7 +123,7 @@ class UserFollowApi extends UserBaseApi
     #[OA\Parameter(
         name: 'user_id',
         in: 'path',
-        description: 'The user to (un)subscribe to/from',
+        description: 'The user to unfollow',
         schema: new OA\Schema(type: 'integer'),
     )]
     #[OA\Tag(name: 'user')]
