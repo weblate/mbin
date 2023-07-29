@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
 
 abstract class WebTestCase extends BaseWebTestCase
@@ -34,5 +35,12 @@ abstract class WebTestCase extends BaseWebTestCase
     public function getService(string $className)
     {
         return $this->getContainer()->get($className);
+    }
+
+    public static function getJsonResponse(KernelBrowser $client): array
+    {
+        $response = $client->getResponse();
+        self::assertJson($response->getContent());
+        return json_decode($response->getContent(), associative: true);
     }
 }

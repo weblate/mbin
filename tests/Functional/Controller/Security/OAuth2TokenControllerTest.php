@@ -20,10 +20,7 @@ class OAuth2TokenControllerTest extends WebTestCase
             'scope' => 'read write',
         ]);
 
-        $response = $client->getResponse();
-
-        self::assertJson($response->getContent());
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
         self::assertArrayHasKey('token_type', $jsonData);
@@ -109,11 +106,7 @@ class OAuth2TokenControllerTest extends WebTestCase
         $pkceCodes = self::runPublicAuthorizationCodeFlow($client, 'yes');
         self::runPublicAuthorizationCodeTokenFetch($client, $pkceCodes['verifier'].'fail');
 
-        $response = $client->getResponse();
-
-        self::assertJson($response->getContent());
-
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);
 
         self::assertResponseStatusCodeSame(400);
         self::assertIsArray($jsonData);
@@ -136,11 +129,7 @@ class OAuth2TokenControllerTest extends WebTestCase
 
         $client->request('GET', $uri);
 
-        $response = $client->getResponse();
-
-        self::assertJson($response->getContent());
-
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);
 
         self::assertResponseStatusCodeSame(400);
         self::assertIsArray($jsonData);
@@ -168,10 +157,7 @@ class OAuth2TokenControllerTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(400);
 
-        $response = $client->getResponse();
-
-        self::assertJson($response->getContent());
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
         self::assertArrayHasKey('error', $jsonData);
@@ -192,11 +178,8 @@ class OAuth2TokenControllerTest extends WebTestCase
         $uri = '/authorize?'.$query;
 
         $client->request('GET', $uri);
-        $response = $client->getResponse();
 
-        self::assertJson($response->getContent());
-
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);
 
         self::assertResponseStatusCodeSame(401);
 
@@ -235,11 +218,8 @@ class OAuth2TokenControllerTest extends WebTestCase
         $uri = '/authorize?'.$query;
 
         $client->request('GET', $uri);
-        $response = $client->getResponse();
 
-        self::assertJson($response->getContent());
-
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);
 
         self::assertResponseStatusCodeSame(401);
 

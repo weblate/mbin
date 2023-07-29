@@ -33,11 +33,8 @@ class OAuth2ClientApiTest extends WebTestCase
         $client->jsonRequest('POST', '/api/client', $requestData);
 
         self::assertResponseIsSuccessful();
-        $response = $client->getResponse();
 
-        self::assertJson($response->getContent());
-
-        $clientData = json_decode($response->getContent(), associative: true);
+        $clientData = self::getJsonResponse($client);
         self::assertIsArray($clientData);
         self::assertArrayHasKey('identifier', $clientData);
         self::assertArrayHasKey('secret', $clientData);
@@ -123,10 +120,7 @@ class OAuth2ClientApiTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
 
-        $response = $client->getResponse();
-        self::assertJson($response->getContent());
-
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
         self::assertArrayHasKey('data', $jsonData);
@@ -168,10 +162,7 @@ class OAuth2ClientApiTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(403);
 
-        $response = $client->getResponse();
-        self::assertJson($response->getContent());
-
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);
         self::assertIsArray($jsonData);
         self::assertArrayHasKey('type', $jsonData);
         self::assertEquals('https://tools.ietf.org/html/rfc2616#section-10', $jsonData['type']);
@@ -200,10 +191,7 @@ class OAuth2ClientApiTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
 
-        $response = $client->getResponse();
-        self::assertJson($response->getContent());
-
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);;
 
         self::assertIsArray($jsonData);
         self::assertArrayHasKey('items', $jsonData);
@@ -265,10 +253,7 @@ class OAuth2ClientApiTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(403);
 
-        $response = $client->getResponse();
-        self::assertJson($response->getContent());
-
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
         self::assertArrayHasKey('type', $jsonData);
@@ -298,10 +283,7 @@ class OAuth2ClientApiTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
 
-        $response = $client->getResponse();
-        self::assertJson($response->getContent());
-
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
         self::assertArrayHasKey('identifier', $jsonData);
@@ -388,10 +370,7 @@ class OAuth2ClientApiTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(403);
 
-        $response = $client->getResponse();
-        self::assertJson($response->getContent());
-
-        $jsonData = json_decode($response->getContent(), associative: true);
+        $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
         self::assertArrayHasKey('type', $jsonData);
