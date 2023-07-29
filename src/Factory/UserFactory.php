@@ -25,7 +25,7 @@ class UserFactory
             $user->avatar ? $this->imageFactory->createDto($user->avatar) : null,
             $user->cover ? $this->imageFactory->createDto($user->cover) : null,
             $user->about,
-            $user->lastActive,
+            $user->createdAt,
             $user->fields,
             $user->apId,
             $user->apProfileId,
@@ -38,6 +38,7 @@ class UserFactory
         $currentUser = $this->security->getUser();
         // Only return the user's vote if permission to control voting has been given
         $dto->isFollowedByUser = $this->security->isGranted('ROLE_OAUTH2_USER:FOLLOW') ? $currentUser->isFollowing($user) : null;
+        $dto->isFollowerOfUser = $this->security->isGranted('ROLE_OAUTH2_USER:FOLLOW') && $user->showProfileFollowings ? $user->isFollowing($currentUser) : null;
         $dto->isBlockedByUser = $this->security->isGranted('ROLE_OAUTH2_USER:BLOCK') ? $currentUser->isBlocked($user) : null;
 
         return $dto;
@@ -52,7 +53,7 @@ class UserFactory
 
     public function createDtoFromAp($apProfileId, $apId): UserDto
     {
-        $dto = UserDto::create(username: '@'.$apId, email: $apId, apId: $apId, apProfileId: $apProfileId);
+        $dto = (new UserDto())->create('@'.$apId, $apId, null, null, null, null, null, $apId, $apProfileId);
         $dto->plainPassword = bin2hex(random_bytes(20));
 
         return $dto;

@@ -14,11 +14,12 @@ class UserResponseDto implements \JsonSerializable
     public string $username;
     public int $followersCount = 0;
     public ?string $about = null;
-    public ?\DateTime $lastActive = null;
+    public ?\DateTimeImmutable $createdAt = null;
     public ?string $apProfileId = null;
     public ?string $apId = null;
     public ?bool $isBot = null;
     public ?bool $isFollowedByUser = null;
+    public ?bool $isFollowerOfUser = null;
     public ?bool $isBlockedByUser = null;
     public ?int $userId = null;
 
@@ -29,12 +30,13 @@ class UserResponseDto implements \JsonSerializable
         $this->about = $dto->about;
         $this->avatar = $dto->avatar;
         $this->cover = $dto->cover;
-        $this->lastActive = $dto->lastActive;
+        $this->createdAt = $dto->createdAt;
         $this->apId = $dto->apId;
         $this->apProfileId = $dto->apProfileId;
         $this->followersCount = $dto->followersCount;
         $this->isBot = true === $dto->isBot;
         $this->isFollowedByUser = $dto->isFollowedByUser;
+        $this->isFollowerOfUser = $dto->isFollowerOfUser;
         $this->isBlockedByUser = $dto->isBlockedByUser;
     }
 
@@ -46,12 +48,13 @@ class UserResponseDto implements \JsonSerializable
             'about' => $this->about,
             'avatar' => $this->avatar?->jsonSerialize(),
             'cover' => $this->cover?->jsonSerialize(),
-            'lastActive' => $this->lastActive?->format(\DateTimeInterface::ATOM),
+            'createdAt' => $this->createdAt?->format(\DateTimeInterface::ATOM),
             'followersCount' => $this->followersCount,
             'apId' => $this->apId,
             'apProfileId' => $this->apProfileId,
             'isBot' => $this->isBot,
             'isFollowedByUser' => $this->isFollowedByUser,
+            'isFollowerOfUser' => $this->isFollowerOfUser,
             'isBlockedByUser' => $this->isBlockedByUser,
         ];
     }
