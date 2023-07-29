@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Functional\Controller\Security;
+namespace App\Tests\Functional\Controller\Api\OAuth2;
 
 use App\Tests\WebTestCase;
 
