@@ -22,6 +22,18 @@ api_user_retrieve_by_name:
   methods: [ GET ]
   format: json
 
+api_current_user_followed:
+  controller: App\Controller\Api\User\UserRetrieveApi::followedByCurrent
+  path: /api/user/followed
+  methods: [ GET ]
+  format: json
+
+api_current_user_followers:
+  controller: App\Controller\Api\User\UserRetrieveApi::followersOfCurrent
+  path: /api/user/followers
+  methods: [ GET ]
+  format: json
+
 api_user_followed:
   controller: App\Controller\Api\User\UserRetrieveApi::followed
   path: /api/users/{user_id}/followed
