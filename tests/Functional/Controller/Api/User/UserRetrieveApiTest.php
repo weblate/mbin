@@ -10,6 +10,37 @@ use Doctrine\ORM\EntityManagerInterface;
 
 class UserRetrieveApiTest extends WebTestCase
 {
+    public const USER_RESPONSE_KEYS = [
+        'userId',
+        'username',
+        'about',
+        'avatar',
+        'cover',
+        'createdAt',
+        'followersCount',
+        'apId',
+        'apProfileId',
+        'isBot',
+        'isFollowedByUser',
+        'isFollowerOfUser',
+        'isBlockedByUser',
+    ];
+    public const USER_SETTINGS_KEYS = [
+        'notifyOnNewEntry',
+        'notifyOnNewEntryReply',
+        'notifyOnNewEntryCommentReply',
+        'notifyOnNewPost',
+        'notifyOnNewPostReply',
+        'notifyOnNewPostCommentReply',
+        'hideAdult',
+        'showProfileSubscriptions',
+        'showProfileFollowings',
+        'addMentionsEntries',
+        'addMentionsPosts',
+        'homepage',
+        'featuredMagazines',
+        'preferredLanguages',
+    ];
     public const NUM_USERS = 10;
 
     public function testApiCanRetrieveUsersWithAboutAnonymous(): void
@@ -27,14 +58,10 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('items', $jsonData);
-        self::assertArrayHasKey('pagination', $jsonData);
+        self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
 
         self::assertIsArray($jsonData['pagination']);
-        self::assertArrayHasKey('count', $jsonData['pagination']);
-        self::assertArrayHasKey('currentPage', $jsonData['pagination']);
-        self::assertArrayHasKey('maxPage', $jsonData['pagination']);
-        self::assertArrayHasKey('perPage', $jsonData['pagination']);
+        self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
 
         self::assertSame(self::NUM_USERS, $jsonData['pagination']['count']);
         self::assertSame(1, $jsonData['pagination']['currentPage']);
@@ -64,8 +91,8 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('pagination', $jsonData);
-        self::assertArrayHasKey('count', $jsonData['pagination']);
+        self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
+        self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
         self::assertSame(self::NUM_USERS, $jsonData['pagination']['count']);
     }
 
@@ -80,20 +107,8 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('userId', $jsonData);
-        self::assertArrayHasKey('username', $jsonData);
-        self::assertArrayHasKey('about', $jsonData);
-        self::assertArrayHasKey('avatar', $jsonData);
-        self::assertArrayHasKey('cover', $jsonData);
-        self::assertArrayNotHasKey('lastActive', $jsonData);
-        self::assertArrayHasKey('createdAt', $jsonData);
-        self::assertArrayHasKey('followersCount', $jsonData);
-        self::assertArrayHasKey('apId', $jsonData);
-        self::assertArrayHasKey('apProfileId', $jsonData);
-        self::assertArrayHasKey('isBot', $jsonData);
-        self::assertArrayHasKey('isFollowedByUser', $jsonData);
-        self::assertArrayHasKey('isFollowerOfUser', $jsonData);
-        self::assertArrayHasKey('isBlockedByUser', $jsonData);
+        self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData);
+
         self::assertSame($testUser->getId(), $jsonData['userId']);
         self::assertSame('UserWithoutAbout', $jsonData['username']);
         self::assertNull($jsonData['about']);
@@ -120,20 +135,8 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('userId', $jsonData);
-        self::assertArrayHasKey('username', $jsonData);
-        self::assertArrayHasKey('about', $jsonData);
-        self::assertArrayHasKey('avatar', $jsonData);
-        self::assertArrayHasKey('cover', $jsonData);
-        self::assertArrayNotHasKey('lastActive', $jsonData);
-        self::assertArrayHasKey('createdAt', $jsonData);
-        self::assertArrayHasKey('followersCount', $jsonData);
-        self::assertArrayHasKey('apId', $jsonData);
-        self::assertArrayHasKey('apProfileId', $jsonData);
-        self::assertArrayHasKey('isBot', $jsonData);
-        self::assertArrayHasKey('isFollowedByUser', $jsonData);
-        self::assertArrayHasKey('isFollowerOfUser', $jsonData);
-        self::assertArrayHasKey('isBlockedByUser', $jsonData);
+        self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData);
+
         self::assertSame($testUser->getId(), $jsonData['userId']);
         self::assertSame('UserWithoutAbout', $jsonData['username']);
         self::assertNull($jsonData['about']);
@@ -156,20 +159,8 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('userId', $jsonData);
-        self::assertArrayHasKey('username', $jsonData);
-        self::assertArrayHasKey('about', $jsonData);
-        self::assertArrayHasKey('avatar', $jsonData);
-        self::assertArrayHasKey('cover', $jsonData);
-        self::assertArrayNotHasKey('lastActive', $jsonData);
-        self::assertArrayHasKey('createdAt', $jsonData);
-        self::assertArrayHasKey('followersCount', $jsonData);
-        self::assertArrayHasKey('apId', $jsonData);
-        self::assertArrayHasKey('apProfileId', $jsonData);
-        self::assertArrayHasKey('isBot', $jsonData);
-        self::assertArrayHasKey('isFollowedByUser', $jsonData);
-        self::assertArrayHasKey('isFollowerOfUser', $jsonData);
-        self::assertArrayHasKey('isBlockedByUser', $jsonData);
+        self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData);
+
         self::assertSame($testUser->getId(), $jsonData['userId']);
         self::assertSame('UserWithoutAbout', $jsonData['username']);
         self::assertNull($jsonData['about']);
@@ -196,20 +187,8 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('userId', $jsonData);
-        self::assertArrayHasKey('username', $jsonData);
-        self::assertArrayHasKey('about', $jsonData);
-        self::assertArrayHasKey('avatar', $jsonData);
-        self::assertArrayHasKey('cover', $jsonData);
-        self::assertArrayNotHasKey('lastActive', $jsonData);
-        self::assertArrayHasKey('createdAt', $jsonData);
-        self::assertArrayHasKey('followersCount', $jsonData);
-        self::assertArrayHasKey('apId', $jsonData);
-        self::assertArrayHasKey('apProfileId', $jsonData);
-        self::assertArrayHasKey('isBot', $jsonData);
-        self::assertArrayHasKey('isFollowedByUser', $jsonData);
-        self::assertArrayHasKey('isFollowerOfUser', $jsonData);
-        self::assertArrayHasKey('isBlockedByUser', $jsonData);
+        self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData);
+
         self::assertSame($testUser->getId(), $jsonData['userId']);
         self::assertSame('UserWithoutAbout', $jsonData['username']);
         self::assertNull($jsonData['about']);
@@ -248,20 +227,8 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('userId', $jsonData);
-        self::assertArrayHasKey('username', $jsonData);
-        self::assertArrayHasKey('about', $jsonData);
-        self::assertArrayHasKey('avatar', $jsonData);
-        self::assertArrayHasKey('cover', $jsonData);
-        self::assertArrayNotHasKey('lastActive', $jsonData);
-        self::assertArrayHasKey('createdAt', $jsonData);
-        self::assertArrayHasKey('followersCount', $jsonData);
-        self::assertArrayHasKey('apId', $jsonData);
-        self::assertArrayHasKey('apProfileId', $jsonData);
-        self::assertArrayHasKey('isBot', $jsonData);
-        self::assertArrayHasKey('isFollowedByUser', $jsonData);
-        self::assertArrayHasKey('isFollowerOfUser', $jsonData);
-        self::assertArrayHasKey('isBlockedByUser', $jsonData);
+        self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData);
+    
         self::assertSame($testUser->getId(), $jsonData['userId']);
         self::assertSame('UserWithoutAbout', $jsonData['username']);
         self::assertNull($jsonData['about']);
@@ -297,9 +264,7 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('isFollowedByUser', $jsonData);
-        self::assertArrayHasKey('isFollowerOfUser', $jsonData);
-        self::assertArrayHasKey('isBlockedByUser', $jsonData);
+        self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData);
         // Follow and block scopes assigned, so these flags should not be null
         self::assertFalse($jsonData['isFollowedByUser']);
         self::assertTrue($jsonData['isFollowerOfUser']);
@@ -329,17 +294,14 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('items', $jsonData);
-        self::assertArrayHasKey('pagination', $jsonData);
+        self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
         
         self::assertIsArray($jsonData['pagination']);
-        self::assertArrayHasKey('count', $jsonData['pagination']);
-        self::assertArrayHasKey('currentPage', $jsonData['pagination']);
-        self::assertArrayHasKey('maxPage', $jsonData['pagination']);
-        self::assertArrayHasKey('perPage', $jsonData['pagination']);
+        self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
         
         self::assertSame(1, $jsonData['pagination']['count']);
         self::assertSame(1, count($jsonData['items']));
+        self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData['items'][0]);
         self::assertSame($blockedUser->getId(), $jsonData['items'][0]['userId']);
     }
 
@@ -392,17 +354,14 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('items', $jsonData);
-        self::assertArrayHasKey('pagination', $jsonData);
+        self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
         
         self::assertIsArray($jsonData['pagination']);
-        self::assertArrayHasKey('count', $jsonData['pagination']);
-        self::assertArrayHasKey('currentPage', $jsonData['pagination']);
-        self::assertArrayHasKey('maxPage', $jsonData['pagination']);
-        self::assertArrayHasKey('perPage', $jsonData['pagination']);
+        self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
         
         self::assertSame(1, $jsonData['pagination']['count']);
         self::assertSame(1, count($jsonData['items']));
+        self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData['items'][0]);
         self::assertSame($followedUser->getId(), $jsonData['items'][0]['userId']);
     }
 
@@ -429,17 +388,14 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('items', $jsonData);
-        self::assertArrayHasKey('pagination', $jsonData);
+        self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
         
         self::assertIsArray($jsonData['pagination']);
-        self::assertArrayHasKey('count', $jsonData['pagination']);
-        self::assertArrayHasKey('currentPage', $jsonData['pagination']);
-        self::assertArrayHasKey('maxPage', $jsonData['pagination']);
-        self::assertArrayHasKey('perPage', $jsonData['pagination']);
+        self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
         
         self::assertSame(1, $jsonData['pagination']['count']);
         self::assertSame(1, count($jsonData['items']));
+        self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData['items'][0]);
         self::assertSame($followingUser->getId(), $jsonData['items'][0]['userId']);
     }
 
@@ -488,17 +444,14 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('items', $jsonData);
-        self::assertArrayHasKey('pagination', $jsonData);
-        
+        self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
+
         self::assertIsArray($jsonData['pagination']);
-        self::assertArrayHasKey('count', $jsonData['pagination']);
-        self::assertArrayHasKey('currentPage', $jsonData['pagination']);
-        self::assertArrayHasKey('maxPage', $jsonData['pagination']);
-        self::assertArrayHasKey('perPage', $jsonData['pagination']);
+        self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
         
         self::assertSame(1, $jsonData['pagination']['count']);
         self::assertSame(1, count($jsonData['items']));
+        self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData['items'][0]);
         self::assertSame($followedUser->getId(), $jsonData['items'][0]['userId']);
     }
 
@@ -525,17 +478,45 @@ class UserRetrieveApiTest extends WebTestCase
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
-        self::assertArrayHasKey('items', $jsonData);
-        self::assertArrayHasKey('pagination', $jsonData);
+        self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
         
         self::assertIsArray($jsonData['pagination']);
-        self::assertArrayHasKey('count', $jsonData['pagination']);
-        self::assertArrayHasKey('currentPage', $jsonData['pagination']);
-        self::assertArrayHasKey('maxPage', $jsonData['pagination']);
-        self::assertArrayHasKey('perPage', $jsonData['pagination']);
+        self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
         
         self::assertSame(1, $jsonData['pagination']['count']);
         self::assertSame(1, count($jsonData['items']));
+        self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData['items'][0]);
         self::assertSame($followingUser->getId(), $jsonData['items'][0]['userId']);
+    }
+
+    public function testApiCannotGetSettingsWithoutScope(): void
+    {
+        $client = self::createClient();
+        self::createOAuth2AuthCodeClient();
+        $testUser = $this->getUserByUsername('JohnDoe');
+
+        $client->loginUser($testUser);
+        $codes = self::getAuthorizationCodeTokenResponse($client, scopes: 'read');
+
+        $client->request('GET', '/api/users/settings', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
+        self::assertResponseStatusCodeSame(403);
+    }
+
+    public function testApiCanGetSettings(): void
+    {
+        $client = self::createClient();
+        self::createOAuth2AuthCodeClient();
+        $testUser = $this->getUserByUsername('JohnDoe');
+
+        $client->loginUser($testUser);
+        $codes = self::getAuthorizationCodeTokenResponse($client, scopes: 'read user:profile:read');
+
+        $client->request('GET', '/api/users/settings', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
+        self::assertResponseIsSuccessful();
+
+        $jsonData = self::getJsonResponse($client);
+
+        self::assertIsArray($jsonData);
+        self::assertArrayKeysMatch(self::USER_SETTINGS_KEYS, $jsonData);
     }
 }
