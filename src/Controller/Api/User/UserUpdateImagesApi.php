@@ -30,9 +30,19 @@ class UserUpdateImagesApi extends UserBaseApi
         ]
     )]
     #[OA\Response(
+        response: 400,
+        description: 'The uploaded image was missing or invalid',
+        content: new OA\JsonContent(ref: new Model(type: \App\Schema\Errors\BadRequestErrorSchema::class))
+    )]
+    #[OA\Response(
         response: 401,
         description: 'Permission denied due to missing or expired token',
         content: new OA\JsonContent(ref: new Model(type: \App\Schema\Errors\UnauthorizedErrorSchema::class))
+    )]
+    #[OA\Response(
+        response: 403,
+        description: 'You are not authorized to update the user\'s profile',
+        content: new OA\JsonContent(ref: new Model(type: \App\Schema\Errors\ForbiddenErrorSchema::class))
     )]
     #[OA\Response(
         response: 429,
@@ -69,7 +79,6 @@ class UserUpdateImagesApi extends UserBaseApi
         ImageFactory $imageFactory,
         RateLimiterFactory $apiImageLimiter
     ): JsonResponse {
-        // TODO
         $headers = $this->rateLimit($apiImageLimiter);
 
         $image = $this->handleUploadedImage();
@@ -97,9 +106,19 @@ class UserUpdateImagesApi extends UserBaseApi
         ]
     )]
     #[OA\Response(
+        response: 400,
+        description: 'The uploaded image was missing or invalid',
+        content: new OA\JsonContent(ref: new Model(type: \App\Schema\Errors\BadRequestErrorSchema::class))
+    )]
+    #[OA\Response(
         response: 401,
         description: 'Permission denied due to missing or expired token',
         content: new OA\JsonContent(ref: new Model(type: \App\Schema\Errors\UnauthorizedErrorSchema::class))
+    )]
+    #[OA\Response(
+        response: 403,
+        description: 'You are not authorized to update the user\'s profile',
+        content: new OA\JsonContent(ref: new Model(type: \App\Schema\Errors\ForbiddenErrorSchema::class))
     )]
     #[OA\Response(
         response: 429,
