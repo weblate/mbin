@@ -34,13 +34,18 @@ class UserUpdateOAuthConsentsApi extends UserBaseApi
         ]
     )]
     #[OA\Response(
+        response: 400,
+        description: 'The request was invalid',
+        content: new OA\JsonContent(ref: new Model(type: \App\Schema\Errors\BadRequestErrorSchema::class))
+    )]
+    #[OA\Response(
         response: 401,
         description: 'Permission denied due to missing or expired token',
         content: new OA\JsonContent(ref: new Model(type: \App\Schema\Errors\UnauthorizedErrorSchema::class))
     )]
     #[OA\Response(
         response: 403,
-        description: 'You do not have permission to edit this consent, or the scopes provided were not a subset of the currently granted scopes',
+        description: 'Either you do not have permission to edit this consent, or you attempted to add additional consents not already granted',
         content: new OA\JsonContent(ref: new Model(type: \App\Schema\Errors\ForbiddenErrorSchema::class))
     )]
     #[OA\Response(
@@ -73,6 +78,7 @@ class UserUpdateOAuthConsentsApi extends UserBaseApi
      * This API can be used to remove scopes from an oauth client.
      *
      * The API cannot, however, add extra scopes the user has not consented to. That's what the OAuth flow is for ;)
+     * This endpoint will not revoke any tokens that currently exist with the given scopes, those tokens will need to be revoked elsewhere.
      */
     public function __invoke(
         #[MapEntity(id: 'consent_id')]
@@ -94,7 +100,7 @@ class UserUpdateOAuthConsentsApi extends UserBaseApi
         if (array_intersect($dto->scopes, $consent->getScopes()) != $dto->scopes) {
             // $dto->scopesGranted is not a subset of the current scopes
             // The client is attempting to request more scopes than it currently has
-            throw new AccessDeniedHttpException('An API client cannot add scopes, only remove them.');
+            throw new AccessDeniedHttpException('An API client cannot add scopes with this API, only remove them.');
         }
 
         $consent->setScopes($dto->scopes);
