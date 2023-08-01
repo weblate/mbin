@@ -21,6 +21,7 @@ class UserBanResponseDto extends UserResponseDto implements \JsonSerializable
     {
         $response = parent::jsonSerialize();
         $response['isBanned'] = $this->isBanned;
+
         return $response;
     }
 }

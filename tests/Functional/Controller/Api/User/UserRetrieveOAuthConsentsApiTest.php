@@ -47,10 +47,10 @@ class UserRetrieveOAuthConsentsApiTest extends WebTestCase
 
         self::assertIsArray($jsonData);
         self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
-        
+
         self::assertIsArray($jsonData['pagination']);
         self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
-        
+
         self::assertSame(1, $jsonData['pagination']['count']);
 
         self::assertIsArray($jsonData['items']);
@@ -80,7 +80,7 @@ class UserRetrieveOAuthConsentsApiTest extends WebTestCase
 
         $client->loginUser($testUser);
         $codes1 = self::getAuthorizationCodeTokenResponse($client, scopes: 'read user:oauth_clients:read user:follow user:block');
-        
+
         $client->loginUser($testUser2);
         $codes2 = self::getAuthorizationCodeTokenResponse($client, scopes: 'read user:oauth_clients:read user:follow user:block');
 
@@ -99,7 +99,7 @@ class UserRetrieveOAuthConsentsApiTest extends WebTestCase
         self::assertArrayKeysMatch(self::CONSENT_RESPONSE_KEYS, $jsonData['items'][0]);
 
         $client->request(
-            'GET', '/api/users/consents/'.(string)$jsonData['items'][0]['consentId'],
+            'GET', '/api/users/consents/'.(string) $jsonData['items'][0]['consentId'],
             server: ['HTTP_AUTHORIZATION' => $codes2['token_type'].' '.$codes2['access_token']]
         );
         self::assertResponseStatusCodeSame(403);
@@ -113,7 +113,7 @@ class UserRetrieveOAuthConsentsApiTest extends WebTestCase
 
         $client->loginUser($testUser);
         $codes = self::getAuthorizationCodeTokenResponse($client, scopes: 'read user:oauth_clients:read user:follow user:block');
-        
+
         $client->request('GET', '/api/users/consents', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
         self::assertResponseIsSuccessful();
 
@@ -131,7 +131,7 @@ class UserRetrieveOAuthConsentsApiTest extends WebTestCase
         $consent = $jsonData['items'][0];
 
         $client->request(
-            'GET', '/api/users/consents/'.(string)$consent['consentId'],
+            'GET', '/api/users/consents/'.(string) $consent['consentId'],
             server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]
         );
         self::assertResponseIsSuccessful();

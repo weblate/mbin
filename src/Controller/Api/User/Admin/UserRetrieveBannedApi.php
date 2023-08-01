@@ -4,7 +4,6 @@ namespace App\Controller\Api\User\Admin;
 
 use App\Controller\Api\User\UserBaseApi;
 use App\DTO\UserBanResponseDto;
-use App\DTO\UserDto;
 use App\Entity\User;
 use App\Factory\UserFactory;
 use App\Repository\UserRepository;

@@ -21,7 +21,7 @@ class UserUpdateApiTest extends WebTestCase
         $client->jsonRequest(
             'PUT', '/api/users/profile',
             parameters: [
-                'about' => 'Updated during test'
+                'about' => 'Updated during test',
             ],
             server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]
         );
@@ -49,7 +49,7 @@ class UserUpdateApiTest extends WebTestCase
         $client->jsonRequest(
             'PUT', '/api/users/profile',
             parameters: [
-                'about' => 'Updated during test'
+                'about' => 'Updated during test',
             ],
             server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]
         );

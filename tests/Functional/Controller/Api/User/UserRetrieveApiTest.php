@@ -48,8 +48,8 @@ class UserRetrieveApiTest extends WebTestCase
         $client = self::createClient();
 
         $users = [];
-        for ($i = 0; $i < self::NUM_USERS; $i++) { 
-            $users[] = $this->getUserByUsername('user'.(string)($i + 1), about: 'Test user '.(string)($i + 1));
+        for ($i = 0; $i < self::NUM_USERS; ++$i) {
+            $users[] = $this->getUserByUsername('user'.(string) ($i + 1), about: 'Test user '.(string) ($i + 1));
         }
 
         $client->request('GET', '/api/users');
@@ -68,7 +68,7 @@ class UserRetrieveApiTest extends WebTestCase
         self::assertSame(1, $jsonData['pagination']['maxPage']);
         // Default perPage count should be used since no perPage value was specified
         self::assertSame(UserRepository::PER_PAGE, $jsonData['pagination']['perPage']);
-        
+
         self::assertIsArray($jsonData['items']);
         self::assertSame(self::NUM_USERS, count($jsonData['items']));
     }
@@ -81,8 +81,8 @@ class UserRetrieveApiTest extends WebTestCase
         $codes = self::getAuthorizationCodeTokenResponse($client, scopes: 'read');
 
         $users = [];
-        for ($i = 0; $i < self::NUM_USERS; $i++) { 
-            $users[] = $this->getUserByUsername('user'.(string)($i + 1), about: 'Test user '.(string)($i + 1));
+        for ($i = 0; $i < self::NUM_USERS; ++$i) {
+            $users[] = $this->getUserByUsername('user'.(string) ($i + 1), about: 'Test user '.(string) ($i + 1));
         }
 
         $client->request('GET', '/api/users', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
@@ -148,6 +148,7 @@ class UserRetrieveApiTest extends WebTestCase
         self::assertNull($jsonData['isFollowerOfUser']);
         self::assertNull($jsonData['isBlockedByUser']);
     }
+
     public function testApiCanRetrieveUserByNameAnonymous(): void
     {
         $client = self::createClient();
@@ -228,7 +229,7 @@ class UserRetrieveApiTest extends WebTestCase
 
         self::assertIsArray($jsonData);
         self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData);
-    
+
         self::assertSame($testUser->getId(), $jsonData['userId']);
         self::assertSame('UserWithoutAbout', $jsonData['username']);
         self::assertNull($jsonData['about']);
@@ -295,10 +296,10 @@ class UserRetrieveApiTest extends WebTestCase
 
         self::assertIsArray($jsonData);
         self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
-        
+
         self::assertIsArray($jsonData['pagination']);
         self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
-        
+
         self::assertSame(1, $jsonData['pagination']['count']);
         self::assertSame(1, count($jsonData['items']));
         self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData['items'][0]);
@@ -355,10 +356,10 @@ class UserRetrieveApiTest extends WebTestCase
 
         self::assertIsArray($jsonData);
         self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
-        
+
         self::assertIsArray($jsonData['pagination']);
         self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
-        
+
         self::assertSame(1, $jsonData['pagination']['count']);
         self::assertSame(1, count($jsonData['items']));
         self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData['items'][0]);
@@ -389,10 +390,10 @@ class UserRetrieveApiTest extends WebTestCase
 
         self::assertIsArray($jsonData);
         self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
-        
+
         self::assertIsArray($jsonData['pagination']);
         self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
-        
+
         self::assertSame(1, $jsonData['pagination']['count']);
         self::assertSame(1, count($jsonData['items']));
         self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData['items'][0]);
@@ -417,7 +418,7 @@ class UserRetrieveApiTest extends WebTestCase
         $client->loginUser($followedUser);
         $codes = self::getAuthorizationCodeTokenResponse($client, scopes: 'read user:follow user:block');
 
-        $client->request('GET', '/api/users/'.(string)$testUser->getId().'/followed', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
+        $client->request('GET', '/api/users/'.(string) $testUser->getId().'/followed', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
         self::assertResponseStatusCodeSame(403);
     }
 
@@ -438,7 +439,7 @@ class UserRetrieveApiTest extends WebTestCase
         $client->loginUser($followedUser);
         $codes = self::getAuthorizationCodeTokenResponse($client, scopes: 'read user:follow user:block');
 
-        $client->request('GET', '/api/users/'.(string)$testUser->getId().'/followed', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
+        $client->request('GET', '/api/users/'.(string) $testUser->getId().'/followed', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
         self::assertResponseIsSuccessful();
 
         $jsonData = self::getJsonResponse($client);
@@ -448,7 +449,7 @@ class UserRetrieveApiTest extends WebTestCase
 
         self::assertIsArray($jsonData['pagination']);
         self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
-        
+
         self::assertSame(1, $jsonData['pagination']['count']);
         self::assertSame(1, count($jsonData['items']));
         self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData['items'][0]);
@@ -472,17 +473,17 @@ class UserRetrieveApiTest extends WebTestCase
         $client->loginUser($followingUser);
         $codes = self::getAuthorizationCodeTokenResponse($client, scopes: 'read user:follow user:block');
 
-        $client->request('GET', '/api/users/'.(string)$testUser->getId().'/followers', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
+        $client->request('GET', '/api/users/'.(string) $testUser->getId().'/followers', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
         self::assertResponseIsSuccessful();
 
         $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
         self::assertArrayKeysMatch(self::PAGINATED_KEYS, $jsonData);
-        
+
         self::assertIsArray($jsonData['pagination']);
         self::assertArrayKeysMatch(self::PAGINATION_KEYS, $jsonData['pagination']);
-        
+
         self::assertSame(1, $jsonData['pagination']['count']);
         self::assertSame(1, count($jsonData['items']));
         self::assertArrayKeysMatch(self::USER_RESPONSE_KEYS, $jsonData['items'][0]);

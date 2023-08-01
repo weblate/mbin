@@ -107,11 +107,11 @@ class UserDeleteApiTest extends WebTestCase
         // Ban user a second time with the API
         $client->request('DELETE', '/api/admin/users/'.(string) $deletedUser->getId().'/delete', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
         self::assertResponseIsSuccessful();
-        
+
         $jsonData = self::getJsonResponse($client);
-        
+
         self::assertArrayKeysMatch(UserRetrieveApiTest::USER_RESPONSE_KEYS, $jsonData);
-        
+
         $repository = $this->getService(UserRepository::class);
         $deletedUser = $repository->find($deletedUser->getId());
         self::assertTrue($deletedUser->isAccountDeleted());

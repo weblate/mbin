@@ -29,7 +29,7 @@ class UserUpdateOAuthConsentsApiTest extends WebTestCase
         self::assertArrayKeysMatch(UserRetrieveOAuthConsentsApiTest::CONSENT_RESPONSE_KEYS, $jsonData['items'][0]);
 
         $client->jsonRequest(
-            'PUT', '/api/users/consents/'.(string)$jsonData['items'][0]['consentId'],
+            'PUT', '/api/users/consents/'.(string) $jsonData['items'][0]['consentId'],
             server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]
         );
         self::assertResponseStatusCodeSame(403);
@@ -63,7 +63,7 @@ class UserUpdateOAuthConsentsApiTest extends WebTestCase
         ], $jsonData['items'][0]['scopesGranted']);
 
         $client->jsonRequest(
-            'PUT', '/api/users/consents/'.(string)$jsonData['items'][0]['consentId'],
+            'PUT', '/api/users/consents/'.(string) $jsonData['items'][0]['consentId'],
             parameters: ['scopes' => [
                 'read',
                 'user:oauth_clients:read',
@@ -97,7 +97,7 @@ class UserUpdateOAuthConsentsApiTest extends WebTestCase
 
         $jsonData = self::getJsonResponse($client);
         $client->jsonRequest(
-            'PUT', '/api/users/consents/'.(string)$jsonData['items'][0]['consentId'],
+            'PUT', '/api/users/consents/'.(string) $jsonData['items'][0]['consentId'],
             parameters: ['scopes' => [
                 'read',
                 'user:oauth_clients:edit',
@@ -109,7 +109,7 @@ class UserUpdateOAuthConsentsApiTest extends WebTestCase
 
         // Existing token still has permission to read oauth consents despite client consent being revoked.
         $client->jsonRequest(
-            'GET', '/api/users/consents/'.(string)$jsonData['consentId'],
+            'GET', '/api/users/consents/'.(string) $jsonData['consentId'],
             server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]
         );
         self::assertResponseIsSuccessful();
@@ -151,7 +151,7 @@ class UserUpdateOAuthConsentsApiTest extends WebTestCase
         ], $jsonData['items'][0]['scopesGranted']);
 
         $client->jsonRequest(
-            'PUT', '/api/users/consents/'.(string)$jsonData['items'][0]['consentId'],
+            'PUT', '/api/users/consents/'.(string) $jsonData['items'][0]['consentId'],
             parameters: ['scopes' => [
                 'read',
                 'user:oauth_clients:read',

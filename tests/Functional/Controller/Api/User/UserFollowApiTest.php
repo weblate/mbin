@@ -77,7 +77,7 @@ class UserFollowApiTest extends WebTestCase
         self::createOAuth2AuthCodeClient();
         $testUser = $this->getUserByUsername('UserWithoutAbout');
         $followedUser = $this->getUserByUsername('JohnDoe');
-        
+
         $testUser->follow($followedUser);
 
         $manager = $this->getService(EntityManagerInterface::class);

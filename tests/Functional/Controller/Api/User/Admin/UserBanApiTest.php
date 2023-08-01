@@ -114,15 +114,15 @@ class UserBanApiTest extends WebTestCase
 
         $client->loginUser($testUser);
         $codes = self::getAuthorizationCodeTokenResponse($client, scopes: 'read admin:user:ban');
-        
+
         $client->request('POST', '/api/admin/users/'.(string) $bannedUser->getId().'/unban', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
         self::assertResponseIsSuccessful();
-        
+
         $jsonData = self::getJsonResponse($client);
-        
+
         self::assertArrayKeysMatch(array_merge(UserRetrieveApiTest::USER_RESPONSE_KEYS, ['isBanned']), $jsonData);
         self::assertFalse($jsonData['isBanned']);
-        
+
         $repository = $this->getService(UserRepository::class);
         $bannedUser = $repository->find($bannedUser->getId());
         self::assertFalse($bannedUser->isBanned);
@@ -198,12 +198,12 @@ class UserBanApiTest extends WebTestCase
         // Ban user a second time with the API
         $client->request('POST', '/api/admin/users/'.(string) $bannedUser->getId().'/ban', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
         self::assertResponseIsSuccessful();
-        
+
         $jsonData = self::getJsonResponse($client);
-        
+
         self::assertArrayKeysMatch(array_merge(UserRetrieveApiTest::USER_RESPONSE_KEYS, ['isBanned']), $jsonData);
         self::assertTrue($jsonData['isBanned']);
-        
+
         $repository = $this->getService(UserRepository::class);
         $bannedUser = $repository->find($bannedUser->getId());
         self::assertTrue($bannedUser->isBanned);
@@ -220,15 +220,15 @@ class UserBanApiTest extends WebTestCase
 
         $client->loginUser($testUser);
         $codes = self::getAuthorizationCodeTokenResponse($client, scopes: 'read admin:user:ban');
-        
+
         $client->request('POST', '/api/admin/users/'.(string) $bannedUser->getId().'/unban', server: ['HTTP_AUTHORIZATION' => $codes['token_type'].' '.$codes['access_token']]);
         self::assertResponseIsSuccessful();
-        
+
         $jsonData = self::getJsonResponse($client);
-        
+
         self::assertArrayKeysMatch(array_merge(UserRetrieveApiTest::USER_RESPONSE_KEYS, ['isBanned']), $jsonData);
         self::assertFalse($jsonData['isBanned']);
-        
+
         $repository = $this->getService(UserRepository::class);
         $bannedUser = $repository->find($bannedUser->getId());
         self::assertFalse($bannedUser->isBanned);
