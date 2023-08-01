@@ -117,6 +117,7 @@ league_oauth2_server:
             'admin:user',
             'admin:user:ban',
             'admin:user:verify',
+            'admin:user:delete',
             'admin:user:purge',
             'admin:instance',
             'admin:instance:stats',
