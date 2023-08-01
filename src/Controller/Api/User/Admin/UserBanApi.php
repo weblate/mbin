@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\Controller\Api\User\Admin;
 
 use App\Controller\Api\User\UserBaseApi;
-use App\DTO\UserResponseDto;
+use App\DTO\UserBanResponseDto;
 use App\Entity\User;
 use App\Factory\UserFactory;
 use App\Service\UserManager;
@@ -22,7 +22,7 @@ class UserBanApi extends UserBaseApi
     #[OA\Response(
         response: 200,
         description: 'User banned',
-        content: new Model(type: UserResponseDto::class),
+        content: new Model(type: UserBanResponseDto::class),
         headers: [
             new OA\Header(header: 'X-RateLimit-Remaining', schema: new OA\Schema(type: 'integer'), description: 'Number of requests left until you will be rate limited'),
             new OA\Header(header: 'X-RateLimit-Retry-After', schema: new OA\Schema(type: 'integer'), description: 'Unix timestamp to retry the request after'),
@@ -75,9 +75,11 @@ class UserBanApi extends UserBaseApi
         $headers = $this->rateLimit($apiModerateLimiter);
 
         $manager->ban($user);
+        $response = $this->serializeUser($factory->createDto($user));
+        $response['isBanned'] = $user->isBanned;
 
         return new JsonResponse(
-            $this->serializeUser($factory->createDto($user)),
+            $response,
             headers: $headers
         );
     }
@@ -85,7 +87,7 @@ class UserBanApi extends UserBaseApi
     #[OA\Response(
         response: 200,
         description: 'User unbanned',
-        content: new Model(type: UserResponseDto::class),
+        content: new Model(type: UserBanResponseDto::class),
         headers: [
             new OA\Header(header: 'X-RateLimit-Remaining', schema: new OA\Schema(type: 'integer'), description: 'Number of requests left until you will be rate limited'),
             new OA\Header(header: 'X-RateLimit-Retry-After', schema: new OA\Schema(type: 'integer'), description: 'Unix timestamp to retry the request after'),
@@ -138,9 +140,11 @@ class UserBanApi extends UserBaseApi
         $headers = $this->rateLimit($apiModerateLimiter);
 
         $manager->unban($user);
+        $response = $this->serializeUser($factory->createDto($user));
+        $response['isBanned'] = $user->isBanned;
 
         return new JsonResponse(
-            $this->serializeUser($factory->createDto($user)),
+            $response,
             headers: $headers
         );
     }

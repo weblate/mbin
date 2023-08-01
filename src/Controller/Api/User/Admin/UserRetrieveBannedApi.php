@@ -3,8 +3,10 @@
 namespace App\Controller\Api\User\Admin;
 
 use App\Controller\Api\User\UserBaseApi;
+use App\DTO\UserBanResponseDto;
 use App\DTO\UserDto;
-use App\DTO\UserResponseDto;
+use App\Entity\User;
+use App\Factory\UserFactory;
 use App\Repository\UserRepository;
 use App\Schema\PaginationSchema;
 use Nelmio\ApiDocBundle\Annotation\Model;
@@ -26,7 +28,7 @@ class UserRetrieveBannedApi extends UserBaseApi
                 new OA\Property(
                     property: 'items',
                     type: 'array',
-                    items: new OA\Items(ref: new Model(type: UserResponseDto::class))
+                    items: new OA\Items(ref: new Model(type: UserBanResponseDto::class))
                 ),
                 new OA\Property(
                     property: 'pagination',
@@ -85,6 +87,7 @@ class UserRetrieveBannedApi extends UserBaseApi
     /** Retrieves a list of users currently banned from the instance */
     public function collection(
         UserRepository $userRepository,
+        UserFactory $factory,
         Request $request,
         RateLimiterFactory $apiModerateLimiter
     ): JsonResponse {
@@ -100,8 +103,8 @@ class UserRetrieveBannedApi extends UserBaseApi
 
         $dtos = [];
         foreach ($users->getCurrentPageResults() as $value) {
-            assert($value instanceof UserDto);
-            array_push($dtos, $this->serializeUser($value));
+            assert($value instanceof User);
+            array_push($dtos, (new UserBanResponseDto($factory->createDto($value), $value->isBanned))->jsonSerialize());
         }
 
         return new JsonResponse(
