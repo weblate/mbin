@@ -102,7 +102,7 @@ class SignatureValidator
     ): void {
         $digest = 'SHA-256='.base64_encode(hash('sha256', $payload, true));
         
-        if (isset($headers['digest']) && $digest !== $headers['digest']) {
+        if (isset($headers['digest']) && $digest !== is_array($headers['digest']) ? $headers['digest'][0] : $headers['digest']) {
             $this->logger->warning('Supplied digest of incoming request does not match calculated value');
         }
 
