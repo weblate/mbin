@@ -20,11 +20,11 @@ class SignatureValidator
     }
 
     /**
-     * Attempts to validate an incoming signed HTTP request
+     * Attempts to validate an incoming signed HTTP request.
      *
-     * @param string $body The body of the incoming request
-     * @param array $headers Headers attached to the incoming request
-     * @return void
+     * @param string $body    The body of the incoming request
+     * @param array  $headers Headers attached to the incoming request
+     *
      * @throws InvalidApSignatureException The HTTP request was not signed appropriately
      */
     public function validate(string $body, array $headers): void
@@ -46,14 +46,12 @@ class SignatureValidator
         $this->validateUrl($id = is_array($payload['id']) ? $payload['id'][0] : $payload['id']);
 
         $keyDomain = parse_url($signature['keyId'], PHP_URL_HOST);
-        $idDomain  = parse_url($id, PHP_URL_HOST);
+        $idDomain = parse_url($id, PHP_URL_HOST);
 
         // @TODO this check appears to essentially be 'attributedTo' !== id
         if (isset($payload['object']) && is_array($payload['object']) && isset($payload['object']['attributedTo'])) {
             if (parse_url($payload['object']['attributedTo'], PHP_URL_HOST) !== $keyDomain) {
-                throw new InvalidApSignatureException(
-                    'Supplied key domain does not match domain of incoming activities "attributedTo" property'
-                );
+                throw new InvalidApSignatureException('Supplied key domain does not match domain of incoming activities "attributedTo" property');
             }
         }
 
@@ -84,14 +82,10 @@ class SignatureValidator
     }
 
     /**
-     * Verifies the signature of request against the given public key 
+     * Verifies the signature of request against the given public key.
      *
-     * @param \OpenSSLAsymmetricKey $pkey 
      * @param array $signature Parsed signature value
-     * @param array $headers
-     * @param string $inboxUrl
-     * @param string $payload
-     * @return void
+     *
      * @throws InvalidApSignatureException Signature failed verification
      */
     private function verifySignature(
@@ -102,7 +96,7 @@ class SignatureValidator
         string $payload,
     ): void {
         $digest = 'SHA-256='.base64_encode(hash('sha256', $payload, true));
-        
+
         if (isset($headers['digest']) && $digest !== $suppliedDigest = is_array($headers['digest']) ? $headers['digest'][0] : $headers['digest']) {
             $this->logger->warning('Supplied digest of incoming request does not match calculated value', ['supplied-digest' => $suppliedDigest]);
         }

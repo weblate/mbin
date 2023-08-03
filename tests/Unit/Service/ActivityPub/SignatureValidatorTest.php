@@ -24,26 +24,24 @@ class SignatureValidatorTest extends TestCase
 
     /**
      * Sets up the test with a valid, hs2019 signed, http request body and headers.
-     * 
-     * Includes the headers and signature that would be included in a request from 
-     * a Lemmy (0.18.3) instance
      *
-     * @return void
+     * Includes the headers and signature that would be included in a request from
+     * a Lemmy (0.18.3) instance
      */
-    public function setUp(): void 
+    public function setUp(): void
     {
         $this->publicKeyPem = file_get_contents(self::KEY_PATH.'public_signing_key.pem');
 
         $this->body = [
             'actor' => 'https://kbin.localhost/m/group',
-            'id'    => 'https://kbin.localhost/f/object/1',
+            'id' => 'https://kbin.localhost/f/object/1',
         ];
         $headers = [
             '(request-target)' => 'post /f/inbox',
-            'content-type'     => 'application/activity+json',
-            'date'             => (new \DateTimeImmutable('now'))->format('D, d M Y H:i:s \G\M\T'),
-            'digest'           => 'SHA-256=' . base64_encode(hash('sha256', json_encode($this->body), true)),
-            'host'             => 'kbin.localhost',
+            'content-type' => 'application/activity+json',
+            'date' => (new \DateTimeImmutable('now'))->format('D, d M Y H:i:s \G\M\T'),
+            'digest' => 'SHA-256='.base64_encode(hash('sha256', json_encode($this->body), true)),
+            'host' => 'kbin.localhost',
         ];
 
         $signingString = implode(
@@ -60,7 +58,7 @@ class SignatureValidatorTest extends TestCase
 
         unset($headers['(request-target)']);
         $headers['signature'] = 'keyId="%s#main-key",headers="'.$signedHeaders.'",algorithm="hs2019",signature="'.$signature.'"';
-        array_walk($headers, function(string &$value) {
+        array_walk($headers, function (string &$value) {
             $value = [$value];
         });
         $this->headers = $headers;
@@ -69,7 +67,7 @@ class SignatureValidatorTest extends TestCase
     /**
      * @doesNotPerformAssertions
      */
-    public function testItValidatesACorrectlySignedRequest(): void 
+    public function testItValidatesACorrectlySignedRequest(): void
     {
         $stubMagazine = $this->createStub(Magazine::class);
         $stubMagazine->apProfileId = 'https://kbin.localhost/m/group';
@@ -101,11 +99,11 @@ class SignatureValidatorTest extends TestCase
         $sut->validate(json_encode($this->body), $this->headers);
     }
 
-    public function testItDoesNotValidateARequestWithDifferentBody(): void 
+    public function testItDoesNotValidateARequestWithDifferentBody(): void
     {
         $stubMagazine = $this->createStub(Magazine::class);
         $stubMagazine->apProfileId = 'https://kbin.localhost/m/group';
-        
+
         $this->headers['signature'][0] = sprintf($this->headers['signature'][0], 'https://kbin.localhost/m/group');
 
         $apManager = $this->createStub(ActivityPubManager::class);
@@ -132,7 +130,7 @@ class SignatureValidatorTest extends TestCase
 
         $badBody = [
             'actor' => 'https://kbin.localhost/m/badgroup',
-            'id'    => 'https://kbin.localhost/f/object/1',
+            'id' => 'https://kbin.localhost/f/object/1',
         ];
 
         $this->expectException(InvalidApSignatureException::class);
@@ -140,14 +138,14 @@ class SignatureValidatorTest extends TestCase
         $sut->validate(json_encode($badBody), $this->headers);
     }
 
-    public function testItDoesNotValidateARequestWhenDomainsDoNotMatch(): void 
+    public function testItDoesNotValidateARequestWhenDomainsDoNotMatch(): void
     {
         $stubMagazine = $this->createStub(Magazine::class);
         $stubMagazine->apProfileId = 'https://kbin.localhost/m/group';
 
         $this->headers['signature'][0] = sprintf($this->headers['signature'][0], 'https://kbin.localhost/m/group');
 
-        $apManager    = $this->createStub(ActivityPubManager::class);
+        $apManager = $this->createStub(ActivityPubManager::class);
         $apHttpClient = $this->createStub(ApHttpClient::class);
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
 
@@ -157,7 +155,7 @@ class SignatureValidatorTest extends TestCase
 
         $badBody = [
             'actor' => 'https://kbin.localhost/m/group',
-            'id'    => 'https://lemmy.localhost/activities/announce/1',
+            'id' => 'https://lemmy.localhost/activities/announce/1',
         ];
 
         $this->expectException(InvalidApSignatureException::class);
@@ -165,14 +163,14 @@ class SignatureValidatorTest extends TestCase
         $sut->validate(json_encode($badBody), $this->headers);
     }
 
-    public function testItDoesNotValidateARequestWhenUrlsAreNotHTTPS(): void 
+    public function testItDoesNotValidateARequestWhenUrlsAreNotHTTPS(): void
     {
         $stubMagazine = $this->createStub(Magazine::class);
         $stubMagazine->apProfileId = 'http://kbin.localhost/m/group';
 
         $this->headers['signature'][0] = sprintf($this->headers['signature'][0], 'http://kbin.localhost/m/group');
 
-        $apManager    = $this->createStub(ActivityPubManager::class);
+        $apManager = $this->createStub(ActivityPubManager::class);
         $apHttpClient = $this->createStub(ApHttpClient::class);
         $urlGenerator = $this->createStub(UrlGeneratorInterface::class);
 
@@ -182,7 +180,7 @@ class SignatureValidatorTest extends TestCase
 
         $badBody = [
             'actor' => 'http://kbin.localhost/m/group',
-            'id'    => 'http://kbin.localhost/f/object/1',
+            'id' => 'http://kbin.localhost/f/object/1',
         ];
 
         $this->expectException(InvalidApSignatureException::class);

@@ -17,7 +17,6 @@ class HttpSignature
     /**
      * Splits a signature header string into component pieces.
      *
-     * @param string $signature
      * @return array{
      *   keyId: string,
      *   algorithm: string,
