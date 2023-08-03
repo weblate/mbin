@@ -42,6 +42,7 @@ class SignatureValidator
 
         $signature = HttpSignature::parseSignatureHeader($signature);
 
+        $this->validateUrl($signature['keyId']);
         $this->validateUrl($id = is_array($payload['id']) ? $payload['id'][0] : $payload['id']);
 
         $keyDomain = parse_url($signature['keyId'], PHP_URL_HOST);
