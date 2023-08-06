@@ -8,12 +8,14 @@ use App\Entity\User;
 use App\Tests\WebTestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class RegisterControllerTest extends WebTestCase
 {
     public function testUserCanVerifyAccount(): void
     {
         $client = $this->createClient();
+        $translator = $this->getService(TranslatorInterface::class);
 
         $this->registerUserAccount($client);
 
@@ -31,7 +33,7 @@ class RegisterControllerTest extends WebTestCase
         $crawler = $client->followRedirect();
 
         $client->submit(
-            $crawler->selectButton('Log in')->form(
+            $crawler->selectButton($translator->trans('login'))->form(
                 [
                     'email' => 'JohnDoe',
                     'password' => 'secret',
@@ -41,15 +43,16 @@ class RegisterControllerTest extends WebTestCase
 
         $client->followRedirect();
 
-        $this->assertSelectorTextNotContains('#header', 'Log in');
+        $this->assertSelectorTextNotContains('#header', $translator->trans('login'));
     }
 
     private function registerUserAccount(KernelBrowser $client): void
     {
         $crawler = $client->request('GET', '/register');
+        $translator = $this->getService(TranslatorInterface::class);
 
         $client->submit(
-            $crawler->filter('form[name=user_register]')->selectButton('Register')->form(
+            $crawler->filter('form[name=user_register]')->selectButton($translator->trans('register'))->form(
                 [
                     'user_register[username]' => 'JohnDoe',
                     'user_register[email]' => 'johndoe@kbin.pub',
@@ -64,15 +67,16 @@ class RegisterControllerTest extends WebTestCase
     public function testUserCannotLoginWithoutConfirmation()
     {
         $client = $this->createClient();
+        $translator = $this->getService(TranslatorInterface::class);
 
         $this->registerUserAccount($client);
 
         $crawler = $client->followRedirect();
 
-        $crawler = $client->click($crawler->filter('#header')->selectLink('Log in')->link());
+        $crawler = $client->click($crawler->filter('#header')->selectLink($translator->trans('login'))->link());
 
         $client->submit(
-            $crawler->selectButton('Log in')->form(
+            $crawler->selectButton($translator->trans('login'))->form(
                 [
                     'email' => 'JohnDoe',
                     'password' => 'wrong_password',
@@ -82,16 +86,17 @@ class RegisterControllerTest extends WebTestCase
 
         $client->followRedirect();
 
-        $this->assertSelectorTextContains('.alert__danger', 'Your account is not active.');
+        $this->assertSelectorTextContains('.alert__danger', $translator->trans('your_account_is_not_active'));
     }
 
     public static function register($active = false): KernelBrowser
     {
         $client = self::createClient();
         $crawler = $client->request('GET', '/register');
+        $translator = self::getContainer()->get(TranslatorInterface::class);
 
         $client->submit(
-            $crawler->filter('form[name=user_register]')->selectButton('Register')->form(
+            $crawler->filter('form[name=user_register]')->selectButton($translator->trans('register'))->form(
                 [
                     'user_register[username]' => 'JohnDoe',
                     'user_register[email]' => 'johndoe@kbin.pub',

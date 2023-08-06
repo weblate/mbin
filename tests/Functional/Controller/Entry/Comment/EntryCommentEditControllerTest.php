@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller\Entry\Comment;
 
 use App\Tests\WebTestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class EntryCommentEditControllerTest extends WebTestCase
 {
     public function testAuthorCanEditOwnEntryComment(): void
     {
         $client = $this->createClient();
+        $translator = $this->getService(TranslatorInterface::class);
         $client->loginUser($this->getUserByUsername('JohnDoe'));
 
         $entry = $this->getEntryByTitle('test entry 1', 'https://kbin.pub');
@@ -18,14 +20,14 @@ class EntryCommentEditControllerTest extends WebTestCase
 
         $crawler = $client->request('GET', "/m/acme/t/{$entry->getId()}/test-entry-1");
 
-        $crawler = $client->click($crawler->filter('#main .entry-comment')->selectLink('edit')->link());
+        $crawler = $client->click($crawler->filter('#main .entry-comment')->selectLink(mb_strtolower($translator->trans('edit')))->link());
 
         $this->assertSelectorExists('#main .entry-comment');
 
         $this->assertSelectorTextContains('#main .entry-comment', 'test comment 1');
 
         $client->submit(
-            $crawler->filter('form[name=entry_comment]')->selectButton('Edit comment')->form(
+            $crawler->filter('form[name=entry_comment]')->selectButton($translator->trans('edit_comment'))->form(
                 [
                     'entry_comment[body]' => 'test comment 2 body',
                 ]
