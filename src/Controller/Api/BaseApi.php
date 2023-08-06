@@ -59,7 +59,7 @@ class BaseApi extends AbstractController
         protected readonly SerializerInterface $serializer,
         protected readonly ValidatorInterface $validator,
         protected readonly EntityManagerInterface $entityManager,
-        private readonly RequestStack $request,
+        protected readonly RequestStack $request,
         private readonly ImageRepository $imageRepository,
         private readonly ReportManager $reportManager,
         private readonly OAuth2ClientAccessRepository $clientAccessRepository,

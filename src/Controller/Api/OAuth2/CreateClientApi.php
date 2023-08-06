@@ -9,6 +9,7 @@ use App\DTO\ImageUploadDto;
 use App\DTO\OAuth2ClientDto;
 use App\DTO\UserDto;
 use App\Entity\Client;
+use App\Factory\ClientFactory;
 use App\Repository\UserRepository;
 use App\Service\ImageManager;
 use App\Service\SettingsManager;
@@ -20,7 +21,6 @@ use League\Bundle\OAuth2ServerBundle\ValueObject\Scope;
 use Nelmio\ApiDocBundle\Annotation\Model;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
@@ -84,8 +84,8 @@ class CreateClientApi extends BaseApi
      * if they're determined enough, the user could retrieve the secret from their device's memory.
      */
     public function __invoke(
-        Request $request,
         ClientManagerInterface $manager,
+        ClientFactory $clientFactory,
         UserManager $userManager,
         UserRepository $userRepository,
         SettingsManager $settingsManager,
@@ -99,6 +99,7 @@ class CreateClientApi extends BaseApi
 
         $headers = $this->rateLimit($apiOauthClientLimiter, $apiOauthClientLimiter);
 
+        $request = $this->request->getCurrentRequest();
         /** @var OAuth2ClientDto $dto */
         $dto = $serializer->deserialize($request->getContent(), OAuth2ClientDto::class, 'json', ['groups' => ['creating']]);
 
@@ -145,7 +146,7 @@ class CreateClientApi extends BaseApi
 
         $manager->save($client);
 
-        $dto = new OAuth2ClientDto($client);
+        $dto = $clientFactory->createDto($client);
 
         return new JsonResponse(
             $dto->jsonSerialize(),
@@ -224,8 +225,8 @@ class CreateClientApi extends BaseApi
      * if they're determined enough, the user could retrieve the secret from their device's memory.
      */
     public function uploadImage(
-        Request $request,
         ClientManagerInterface $manager,
+        ClientFactory $clientFactory,
         UserManager $userManager,
         UserRepository $userRepository,
         SettingsManager $settingsManager,
@@ -240,7 +241,7 @@ class CreateClientApi extends BaseApi
 
         $image = $this->handleUploadedImage();
 
-        $dto = $this->deserializeClientFromForm($request);
+        $dto = $this->deserializeClientFromForm();
 
         $validatorGroups = ['Default'];
         // If the client being requested wishes to use the client_credentials flow,
@@ -286,7 +287,7 @@ class CreateClientApi extends BaseApi
 
         $manager->save($client);
 
-        $dto = new OAuth2ClientDto($client);
+        $dto = $clientFactory->createDto($client);
 
         return new JsonResponse(
             $dto->jsonSerialize(),
@@ -295,9 +296,10 @@ class CreateClientApi extends BaseApi
         );
     }
 
-    protected function deserializeClientFromForm(Request $request, OAuth2ClientDto $dto = null): OAuth2ClientDto
+    protected function deserializeClientFromForm(OAuth2ClientDto $dto = null): OAuth2ClientDto
     {
-        $dto = $dto ? $dto : new OAuth2ClientDto(null);
+        $request = $this->request->getCurrentRequest();
+        $dto = $dto ? $dto : new OAuth2ClientDto();
         $dto->name = $request->get('name', $dto->name);
         $dto->contactEmail = $request->get('contactEmail', $dto->contactEmail);
         $dto->description = $request->get('description', $dto->description);

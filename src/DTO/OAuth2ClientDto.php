@@ -4,12 +4,8 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
-use App\Entity\Client;
 use App\Entity\OAuth2UserConsent;
 use App\Utils\RegPatterns;
-use League\Bundle\OAuth2ServerBundle\ValueObject\Grant;
-use League\Bundle\OAuth2ServerBundle\ValueObject\RedirectUri;
-use League\Bundle\OAuth2ServerBundle\ValueObject\Scope;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -223,30 +219,19 @@ class OAuth2ClientDto extends ImageUploadDto implements \JsonSerializable
         }
     }
 
-    public function __construct(?Client $client)
+    public static function create(string $identifier, string $secret, string $name, UserSmallResponseDto $user = null, string $contactEmail = null, string $description = null, array $redirectUris = [], array $grants = [], array $scopes = ['read'], ImageDto $image = null): OAuth2ClientDto
     {
-        if ($client) {
-            $this->identifier = $client->getIdentifier();
-            $this->secret = $client->getSecret();
-            $this->name = $client->getName();
-            $this->user = $client->getUser() ? new UserSmallResponseDto($client->getUser()) : null;
-            $this->contactEmail = $client->getContactEmail();
-            $this->description = $client->getDescription();
-            $this->redirectUris = array_map(fn (RedirectUri $uri) => (string) $uri, $client->getRedirectUris());
-            $this->grants = array_map(fn (Grant $grant) => (string) $grant, $client->getGrants());
-            $this->scopes = array_map(fn (Scope $scope) => (string) $scope, $client->getScopes());
-            $this->image = $client->getImage() ? new ImageDto($client->getImage()) : null;
-        }
-    }
-
-    public static function make(string $name, string $description = null, array $redirectUris = [], array $grants = [], array $scopes = ['read']): OAuth2ClientDto
-    {
-        $dto = new OAuth2ClientDto(null);
+        $dto = new OAuth2ClientDto();
+        $dto->identifier = $identifier;
+        $dto->secret = $secret;
         $dto->name = $name;
+        $dto->user = $user;
+        $dto->contactEmail = $contactEmail;
         $dto->description = $description;
         $dto->redirectUris = $redirectUris;
         $dto->grants = $grants;
         $dto->scopes = $scopes;
+        $dto->image = $image;
 
         return $dto;
     }
