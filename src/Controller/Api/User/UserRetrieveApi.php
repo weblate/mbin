@@ -19,7 +19,6 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -280,12 +279,12 @@ class UserRetrieveApi extends UserBaseApi
     public function collection(
         UserRepository $userRepository,
         UserFactory $userFactory,
-        Request $request,
         RateLimiterFactory $apiReadLimiter,
         RateLimiterFactory $anonymousApiReadLimiter
     ): JsonResponse {
         $headers = $this->rateLimit($apiReadLimiter, $anonymousApiReadLimiter);
 
+        $request = $this->request->getCurrentRequest();
         $group = $request->get('group', UserRepository::USERS_ALL);
 
         $users = $userRepository->findWithAboutPaginated(
@@ -380,7 +379,6 @@ class UserRetrieveApi extends UserBaseApi
         User $user,
         UserRepository $repository,
         UserFactory $factory,
-        Request $request,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiReadLimiter);
@@ -389,6 +387,7 @@ class UserRetrieveApi extends UserBaseApi
             throw new AccessDeniedHttpException('You are not permitted to view the users followed by this user');
         }
 
+        $request = $this->request->getCurrentRequest();
         $users = $repository->findFollowing(
             $this->getPageNb($request),
             $user,
@@ -476,11 +475,11 @@ class UserRetrieveApi extends UserBaseApi
         User $user,
         UserRepository $repository,
         UserFactory $factory,
-        Request $request,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiReadLimiter);
 
+        $request = $this->request->getCurrentRequest();
         $users = $repository->findFollowers(
             $this->getPageNb($request),
             $user,
@@ -565,11 +564,11 @@ class UserRetrieveApi extends UserBaseApi
     public function followedByCurrent(
         UserRepository $repository,
         UserFactory $factory,
-        Request $request,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiReadLimiter);
 
+        $request = $this->request->getCurrentRequest();
         $users = $repository->findFollowing(
             $this->getPageNb($request),
             $this->getUserOrThrow(),
@@ -649,11 +648,11 @@ class UserRetrieveApi extends UserBaseApi
     public function followersOfCurrent(
         UserRepository $repository,
         UserFactory $factory,
-        Request $request,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiReadLimiter);
 
+        $request = $this->request->getCurrentRequest();
         $users = $repository->findFollowers(
             $this->getPageNb($request),
             $this->getUserOrThrow(),
@@ -728,11 +727,11 @@ class UserRetrieveApi extends UserBaseApi
     public function blocked(
         UserRepository $repository,
         UserFactory $factory,
-        Request $request,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiReadLimiter);
 
+        $request = $this->request->getCurrentRequest();
         $users = $repository->findBlockedUsers(
             $this->getPageNb($request),
             $this->getUserOrThrow(),

@@ -6,7 +6,6 @@ namespace App\Controller\Api\User;
 
 use App\DTO\ImageUploadDto;
 use App\DTO\UserResponseDto;
-use App\Factory\ImageFactory;
 use App\Factory\UserFactory;
 use App\Service\ImageManager;
 use App\Service\UserManager;
@@ -76,7 +75,6 @@ class UserUpdateImagesApi extends UserBaseApi
     public function avatar(
         UserManager $manager,
         UserFactory $factory,
-        ImageFactory $imageFactory,
         RateLimiterFactory $apiImageLimiter
     ): JsonResponse {
         $headers = $this->rateLimit($apiImageLimiter);
@@ -85,7 +83,7 @@ class UserUpdateImagesApi extends UserBaseApi
 
         $dto = $manager->createDto($this->getUserOrThrow());
 
-        $dto->avatar = $image ? $imageFactory->createDto($image) : $dto->avatar;
+        $dto->avatar = $image ? $this->imageFactory->createDto($image) : $dto->avatar;
 
         $user = $manager->edit($this->getUserOrThrow(), $dto);
 
@@ -152,7 +150,6 @@ class UserUpdateImagesApi extends UserBaseApi
     public function cover(
         UserManager $manager,
         UserFactory $factory,
-        ImageFactory $imageFactory,
         RateLimiterFactory $apiImageLimiter
     ): JsonResponse {
         $headers = $this->rateLimit($apiImageLimiter);
@@ -161,7 +158,7 @@ class UserUpdateImagesApi extends UserBaseApi
 
         $dto = $manager->createDto($this->getUserOrThrow());
 
-        $dto->cover = $image ? $imageFactory->createDto($image) : $dto->cover;
+        $dto->cover = $image ? $this->imageFactory->createDto($image) : $dto->cover;
 
         $user = $manager->edit($this->getUserOrThrow(), $dto);
 

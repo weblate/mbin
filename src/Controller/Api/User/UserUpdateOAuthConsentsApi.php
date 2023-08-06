@@ -13,7 +13,6 @@ use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
@@ -84,11 +83,11 @@ class UserUpdateOAuthConsentsApi extends UserBaseApi
         #[MapEntity(id: 'consent_id')]
         OAuth2UserConsent $consent,
         ClientConsentsFactory $factory,
-        Request $request,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
         $headers = $this->rateLimit($apiReadLimiter);
 
+        $request = $this->request->getCurrentRequest();
         /** @var ClientConsentsRequestDto $dto */
         $dto = $this->serializer->deserialize($request->getContent(), ClientConsentsRequestDto::class, 'json');
 

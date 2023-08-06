@@ -12,7 +12,6 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 
@@ -87,11 +86,11 @@ class UserRetrieveBannedApi extends UserBaseApi
     public function collection(
         UserRepository $userRepository,
         UserFactory $factory,
-        Request $request,
         RateLimiterFactory $apiModerateLimiter
     ): JsonResponse {
         $headers = $this->rateLimit($apiModerateLimiter);
 
+        $request = $this->request->getCurrentRequest();
         $group = $request->get('group', UserRepository::USERS_ALL);
 
         $users = $userRepository->findBannedPaginated(

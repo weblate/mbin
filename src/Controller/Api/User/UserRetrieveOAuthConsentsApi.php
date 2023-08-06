@@ -16,7 +16,6 @@ use Pagerfanta\Exception\NotValidCurrentPageException;
 use Pagerfanta\Pagerfanta;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -148,7 +147,6 @@ class UserRetrieveOAuthConsentsApi extends UserBaseApi
     #[Security(name: 'oauth2', scopes: ['user:oauth_clients:read'])]
     #[IsGranted('ROLE_OAUTH2_USER:OAUTH_CLIENTS:READ')]
     public function collection(
-        Request $request,
         ClientConsentsFactory $factory,
         RateLimiterFactory $apiReadLimiter,
     ): JsonResponse {
@@ -160,6 +158,7 @@ class UserRetrieveOAuthConsentsApi extends UserBaseApi
             )
         );
 
+        $request = $this->request->getCurrentRequest();
         $page = $this->getPageNb($request);
         $perPage = self::constrainPerPage($request->get('perPage', self::PER_PAGE));
 

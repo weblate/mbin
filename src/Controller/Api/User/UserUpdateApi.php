@@ -14,7 +14,6 @@ use Nelmio\ApiDocBundle\Annotation\Model;
 use Nelmio\ApiDocBundle\Annotation\Security;
 use OpenApi\Attributes as OA;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\RateLimiter\RateLimiterFactory;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
@@ -52,7 +51,6 @@ class UserUpdateApi extends UserBaseApi
     #[Security(name: 'oauth2', scopes: ['user:profile:edit'])]
     #[IsGranted('ROLE_OAUTH2_USER:PROFILE:EDIT')]
     public function profile(
-        Request $request,
         UserManager $manager,
         ValidatorInterface $validator,
         UserFactory $factory,
@@ -60,6 +58,7 @@ class UserUpdateApi extends UserBaseApi
     ): JsonResponse {
         $headers = $this->rateLimit($apiUpdateLimiter);
 
+        $request = $this->request->getCurrentRequest();
         /** @var UserProfileRequestDto $dto */
         $deserialized = $this->serializer->deserialize($request->getContent(), UserProfileRequestDto::class, 'json');
 
@@ -110,7 +109,6 @@ class UserUpdateApi extends UserBaseApi
     #[Security(name: 'oauth2', scopes: ['user:profile:edit'])]
     #[IsGranted('ROLE_OAUTH2_USER:PROFILE:EDIT')]
     public function settings(
-        Request $request,
         UserSettingsManager $manager,
         ValidatorInterface $validator,
         RateLimiterFactory $apiUpdateLimiter,
@@ -119,7 +117,7 @@ class UserUpdateApi extends UserBaseApi
 
         $settings = $manager->createDto($this->getUserOrThrow());
 
-        $dto = $this->deserializeUserSettings($request, $settings);
+        $dto = $this->deserializeUserSettings($settings);
 
         $errors = $validator->validate($dto);
         if (count($errors) > 0) {

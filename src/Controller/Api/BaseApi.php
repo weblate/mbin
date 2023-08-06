@@ -26,6 +26,7 @@ use App\Entity\PostComment;
 use App\Exception\SubjectHasBeenReportedException;
 use App\Factory\EntryCommentFactory;
 use App\Factory\EntryFactory;
+use App\Factory\ImageFactory;
 use App\Factory\MagazineFactory;
 use App\Factory\PostCommentFactory;
 use App\Factory\PostFactory;
@@ -65,6 +66,7 @@ class BaseApi extends AbstractController
         protected readonly SerializerInterface $serializer,
         protected readonly ValidatorInterface $validator,
         protected readonly EntityManagerInterface $entityManager,
+        protected readonly ImageFactory $imageFactory,
         protected readonly PostFactory $postFactory,
         protected readonly PostCommentFactory $postCommentFactory,
         protected readonly EntryFactory $entryFactory,
