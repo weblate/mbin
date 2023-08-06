@@ -191,7 +191,7 @@ class OAuth2ClientApiTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
 
-        $jsonData = self::getJsonResponse($client);;
+        $jsonData = self::getJsonResponse($client);
 
         self::assertIsArray($jsonData);
         self::assertArrayHasKey('items', $jsonData);

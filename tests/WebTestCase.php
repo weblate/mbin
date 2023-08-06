@@ -13,6 +13,10 @@ abstract class WebTestCase extends BaseWebTestCase
     use FactoryTrait;
     use OAuth2FlowTrait;
 
+    protected const PAGINATED_KEYS = ['items', 'pagination'];
+    protected const PAGINATION_KEYS = ['count', 'currentPage', 'maxPage', 'perPage'];
+    protected const IMAGE_KEYS = ['filePath', 'sourceUrl', 'storageUrl', 'altText', 'width', 'height'];
+
     protected ArrayCollection $users;
     protected ArrayCollection $magazines;
     protected ArrayCollection $entries;
@@ -41,6 +45,19 @@ abstract class WebTestCase extends BaseWebTestCase
     {
         $response = $client->getResponse();
         self::assertJson($response->getContent());
+
         return json_decode($response->getContent(), associative: true);
+    }
+
+    /**
+     * Checks that all values in array $keys are present as keys in array $value, and that no additional keys are included.
+     */
+    public static function assertArrayKeysMatch(array $keys, array $value, string $message = ''): void
+    {
+        $flipped = array_flip($keys);
+        $difference = array_diff_key($value, $flipped);
+        self::assertEmpty($difference, $message);
+        $intersect = array_intersect_key($value, $flipped);
+        self::assertCount(count($flipped), $intersect, $message);
     }
 }

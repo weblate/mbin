@@ -77,7 +77,7 @@ trait FactoryTrait
         ];
     }
 
-    private function createUser(string $username, string $email = null, string $password = null, $active = true, $hideAdult = true): User
+    private function createUser(string $username, string $email = null, string $password = null, $active = true, $hideAdult = true, $about = null): User
     {
         $manager = $this->getService(EntityManagerInterface::class);
 
@@ -93,6 +93,7 @@ trait FactoryTrait
         $user->showProfileFollowings = true;
         $user->showProfileSubscriptions = true;
         $user->hideAdult = $hideAdult;
+        $user->about = $about;
         $user->avatar = $this->createImage(bin2hex(random_bytes(20)).'.png');
 
         $manager->persist($user);
@@ -195,7 +196,7 @@ trait FactoryTrait
         ];
     }
 
-    protected function getUserByUsername(string $username, bool $isAdmin = false, bool $hideAdult = true): User
+    protected function getUserByUsername(string $username, bool $isAdmin = false, bool $hideAdult = true, string $about = null, bool $active = true): User
     {
         $user = $this->users->filter(
             static function (User $user) use ($username) {
@@ -203,7 +204,7 @@ trait FactoryTrait
             }
         )->first();
 
-        $user = $user ?: $this->createUser($username, hideAdult: $hideAdult);
+        $user = $user ?: $this->createUser($username, hideAdult: $hideAdult, about: $about, active: $active);
 
         if ($isAdmin) {
             $user->roles = ['ROLE_ADMIN'];
