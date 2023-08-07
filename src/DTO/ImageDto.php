@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
-use App\Entity\Image;
 use OpenApi\Attributes as OA;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\Ignore;
 
 #[OA\Schema()]
 class ImageDto implements \JsonSerializable
@@ -16,32 +16,28 @@ class ImageDto implements \JsonSerializable
     #[Groups(['common'])]
     public ?string $sourceUrl = null;
     #[Groups(['common'])]
+    public ?string $storageUrl = null;
+    #[Groups(['common'])]
     public ?string $altText = null;
     #[Groups(['common'])]
     public ?int $width = null;
     #[Groups(['common'])]
     public ?int $height = null;
+    #[Ignore]
+    public ?int $id = null;
 
-    public function __construct(Image $image = null)
+    public static function create(int $id, string $filePath, int $width = null, int $height = null, string $altText = null, string $sourceUrl = null, string $storageUrl = null): self
     {
-        if (null !== $image) {
-            $this->filePath = $image->filePath;
-            $this->sourceUrl = $image->sourceUrl;
-            $this->altText = $image->altText;
-            $this->width = $image->width;
-            $this->height = $image->height;
-        }
-    }
+        $dto = new ImageDto();
+        $dto->filePath = $filePath;
+        $dto->altText = $altText;
+        $dto->width = $width;
+        $dto->height = $height;
+        $dto->sourceUrl = $sourceUrl;
+        $dto->storageUrl = $storageUrl;
+        $dto->id = $id;
 
-    public function create(string $filePath, int $width = null, int $height = null, string $altText = null, string $sourceUrl = null): self
-    {
-        $this->filePath = $filePath;
-        $this->altText = $altText;
-        $this->width = $width;
-        $this->height = $height;
-        $this->sourceUrl = $sourceUrl;
-
-        return $this;
+        return $dto;
     }
 
     public function jsonSerialize(): mixed
@@ -49,6 +45,7 @@ class ImageDto implements \JsonSerializable
         return [
             'filePath' => $this->filePath,
             'sourceUrl' => $this->sourceUrl,
+            'storageUrl' => $this->storageUrl,
             'altText' => $this->altText,
             'width' => $this->width,
             'height' => $this->height,

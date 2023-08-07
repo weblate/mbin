@@ -5,9 +5,23 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller\Api\OAuth2;
 
 use App\Tests\WebTestCase;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class OAuth2ClientApiTest extends WebTestCase
 {
+    public const CLIENT_RESPONSE_KEYS = [
+        'identifier',
+        'secret',
+        'name',
+        'contactEmail',
+        'description',
+        'user',
+        'redirectUris',
+        'grants',
+        'scopes',
+        'image'
+    ];
+
     public function testApiCanCreateWorkingClient(): void
     {
         $client = self::createClient();
@@ -36,27 +50,19 @@ class OAuth2ClientApiTest extends WebTestCase
 
         $clientData = self::getJsonResponse($client);
         self::assertIsArray($clientData);
-        self::assertArrayHasKey('identifier', $clientData);
-        self::assertArrayHasKey('secret', $clientData);
+        self::assertArrayKeysMatch(self::CLIENT_RESPONSE_KEYS, $clientData);
+        self::assertNotNull($clientData['identifier']);
         self::assertNotNull($clientData['secret']);
-        self::assertArrayHasKey('name', $clientData);
         self::assertEquals($requestData['name'], $clientData['name']);
-        self::assertArrayHasKey('contactEmail', $clientData);
         self::assertEquals($requestData['contactEmail'], $clientData['contactEmail']);
-        self::assertArrayHasKey('description', $clientData);
         self::assertEquals($requestData['description'], $clientData['description']);
-        self::assertArrayHasKey('user', $clientData);
         self::assertNull($clientData['user']);
-        self::assertArrayHasKey('redirectUris', $clientData);
         self::assertIsArray($clientData['redirectUris']);
         self::assertEquals($requestData['redirectUris'], $clientData['redirectUris']);
-        self::assertArrayHasKey('grants', $clientData);
         self::assertIsArray($clientData['grants']);
         self::assertEquals($requestData['grants'], $clientData['grants']);
-        self::assertArrayHasKey('scopes', $clientData);
         self::assertIsArray($clientData['scopes']);
         self::assertEquals($requestData['scopes'], $clientData['scopes']);
-        self::assertArrayHasKey('image', $clientData);
         self::assertNull($clientData['image']);
 
         $client->loginUser($this->getUserByUsername('JohnDoe'));
@@ -67,6 +73,70 @@ class OAuth2ClientApiTest extends WebTestCase
             clientSecret: $clientData['secret'],
             redirectUri: $clientData['redirectUris'][0],
         );
+
+        self::assertResponseIsSuccessful();
+        self::assertIsArray($jsonData);
+    }
+
+    public function testApiCanCreateWorkingClientWithImage(): void
+    {
+        $client = self::createClient();
+
+        $requestData = [
+            'name' => '/kbin API Created Test Client',
+            'description' => 'An OAuth2 client for testing purposes, created via the API',
+            'contactEmail' => 'test@kbin.test',
+            'redirectUris' => [
+                'https://localhost:3002',
+            ],
+            'grants' => [
+                'authorization_code',
+                'refresh_token',
+            ],
+            'scopes' => [
+                'read',
+                'write',
+                'admin:oauth_clients:read',
+            ],
+        ];
+
+        // Uploading a file appears to delete the file at the given path, so make a copy before upload
+        copy($this->kibbyPath, $this->kibbyPath.'.tmp');
+        $image = new UploadedFile($this->kibbyPath.'.tmp', 'kibby_emoji.png', 'image/png');
+
+        $client->request('POST', '/api/client-with-logo', $requestData, files: ['uploadImage' => $image]);
+
+        self::assertResponseIsSuccessful();
+
+        $clientData = self::getJsonResponse($client);
+        self::assertIsArray($clientData);
+        self::assertArrayKeysMatch(self::CLIENT_RESPONSE_KEYS, $clientData);
+        self::assertNotNull($clientData['identifier']);
+        self::assertNotNull($clientData['secret']);
+        self::assertEquals($requestData['name'], $clientData['name']);
+        self::assertEquals($requestData['contactEmail'], $clientData['contactEmail']);
+        self::assertEquals($requestData['description'], $clientData['description']);
+        self::assertNull($clientData['user']);
+        self::assertIsArray($clientData['redirectUris']);
+        self::assertEquals($requestData['redirectUris'], $clientData['redirectUris']);
+        self::assertIsArray($clientData['grants']);
+        self::assertEquals($requestData['grants'], $clientData['grants']);
+        self::assertIsArray($clientData['scopes']);
+        self::assertEquals($requestData['scopes'], $clientData['scopes']);
+        self::assertisArray($clientData['image']);
+        self::assertArrayKeysMatch(self::IMAGE_KEYS, $clientData['image']);
+
+        $client->loginUser($this->getUserByUsername('JohnDoe'));
+
+        self::runAuthorizationCodeFlowToConsentPage($client, 'read write', 'oauth2state', $clientData['identifier'], $clientData['redirectUris'][0]);
+
+        self::assertSelectorExists("img.oauth-client-logo");
+        $logo = $client->getCrawler()->filter("img.oauth-client-logo")->first();
+        self::assertStringContainsString($clientData['image']['filePath'], $logo->attr('src'));
+
+        self::runAuthorizationCodeFlowToRedirectUri($client, 'read write', 'yes', 'oauth2state', $clientData['identifier'], $clientData['redirectUris'][0]);
+
+        $jsonData = self::runAuthorizationCodeTokenFlow($client, $clientData['identifier'], $clientData['secret'], $clientData['redirectUris'][0]);
 
         self::assertResponseIsSuccessful();
         self::assertIsArray($jsonData);

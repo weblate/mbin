@@ -21,12 +21,15 @@ abstract class WebTestCase extends BaseWebTestCase
     protected ArrayCollection $magazines;
     protected ArrayCollection $entries;
 
+    protected string $kibbyPath;
+
     public function __construct($name = null, array $data = [], $dataName = '')
     {
         parent::__construct($name, $data, $dataName);
         $this->users = new ArrayCollection();
         $this->magazines = new ArrayCollection();
         $this->entries = new ArrayCollection();
+        $this->kibbyPath = dirname(__FILE__).'/assets/kibby_emoji.png';
     }
 
     /**

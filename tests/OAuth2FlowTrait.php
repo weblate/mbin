@@ -72,6 +72,35 @@ trait OAuth2FlowTrait
         self::runAuthorizationCodeFlowToRedirectUri($client, $scopes, $consent, $state, $clientId, $redirectUri);
     }
 
+    public static function runAuthorizationCodeTokenFlow(KernelBrowser $client, string $clientId = 'testclient', string $clientSecret = 'testsecret', string $redirectUri = 'https://localhost:3001'): array
+    {
+        $response = $client->getResponse();
+        $parsedUrl = parse_url($response->headers->get('Location'));
+
+        $result = [];
+        parse_str($parsedUrl['query'], $result);
+
+        self::assertArrayHasKey('code', $result);
+        self::assertMatchesRegularExpression(self::CODE_REGEX, $result['code']);
+        self::assertArrayHasKey('state', $result);
+        self::assertEquals('oauth2state', $result['state']);
+
+        $client->request('POST', '/token', [
+            'grant_type' => 'authorization_code',
+            'client_id' => $clientId,
+            'client_secret' => $clientSecret,
+            'code' => $result['code'],
+            'redirect_uri' => $redirectUri,
+        ]);
+
+        $response = $client->getResponse();
+
+        self::assertJson($response->getContent());
+
+        return json_decode($response->getContent(), associative: true);
+    }
+
+
     private const VERIFIER_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
 
     protected static function getPKCECodes(): array
@@ -158,31 +187,7 @@ trait OAuth2FlowTrait
     public static function getAuthorizationCodeTokenResponse(KernelBrowser $client, string $clientId = 'testclient', string $clientSecret = 'testsecret', string $redirectUri = 'https://localhost:3001', string $scopes = 'read write'): array
     {
         self::runAuthorizationCodeFlow($client, 'yes', $scopes, clientId: $clientId, redirectUri: $redirectUri);
-
-        $response = $client->getResponse();
-        $parsedUrl = parse_url($response->headers->get('Location'));
-
-        $result = [];
-        parse_str($parsedUrl['query'], $result);
-
-        self::assertArrayHasKey('code', $result);
-        self::assertMatchesRegularExpression(self::CODE_REGEX, $result['code']);
-        self::assertArrayHasKey('state', $result);
-        self::assertEquals('oauth2state', $result['state']);
-
-        $client->request('POST', '/token', [
-            'grant_type' => 'authorization_code',
-            'client_id' => $clientId,
-            'client_secret' => $clientSecret,
-            'code' => $result['code'],
-            'redirect_uri' => $redirectUri,
-        ]);
-
-        $response = $client->getResponse();
-
-        self::assertJson($response->getContent());
-
-        return json_decode($response->getContent(), associative: true);
+        return self::runAuthorizationCodeTokenFlow($client, $clientId, $clientSecret, $redirectUri);
     }
 
     public static function getRefreshTokenResponse(KernelBrowser $client, string $refreshToken, string $clientId = 'testclient', string $clientSecret = 'testsecret', string $redirectUri = 'https://localhost:3001', string $scopes = 'read write'): array
