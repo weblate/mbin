@@ -16,6 +16,7 @@ abstract class WebTestCase extends BaseWebTestCase
     protected const PAGINATED_KEYS = ['items', 'pagination'];
     protected const PAGINATION_KEYS = ['count', 'currentPage', 'maxPage', 'perPage'];
     protected const IMAGE_KEYS = ['filePath', 'sourceUrl', 'storageUrl', 'altText', 'width', 'height'];
+    protected const USER_RESPONSE_KEYS = ['userId', 'username', 'about', 'avatar', 'cover', 'createdAt', 'followersCount', 'apId', 'apProfileId', 'isBot', 'isFollowedByUser', 'isFollowerOfUser', 'isBlockedByUser'];
 
     protected ArrayCollection $users;
     protected ArrayCollection $magazines;
