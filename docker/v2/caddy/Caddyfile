@@ -12,14 +12,21 @@
     
     encode br zstd gzip
 
-    @static {
+    @static_files {
         path_regexp \.(ico|css|js|gif|jpg|webp|jpeg|png|svg|woff)$
     }
-    header @static Cache-Control max-age=259200
+    header @static_files Cache-Control max-age=259200
 
     route {
         root * /var/www/kbin/public
   
+        @supports_webp {
+            header_regexp Accept image/webp
+            path_regexp image_path /media/cache/resolve(?P<image_file>.*)$
+        }
+        handle @supports_webp {
+            try_files /media/cache/{re.image_path.image_file}.webp
+        }
         handle_path /media/cache/resolve* {
             try_files /media/cache{path}
         }
