@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Tests\Functional\Controller\Security;
 
 use App\Tests\WebTestCase;
+use Symfony\Contracts\Translation\TranslatorInterface;
 
 class LoginControllerTest extends WebTestCase
 {
@@ -47,7 +48,8 @@ class LoginControllerTest extends WebTestCase
 
         $client->followRedirect();
 
-        $this->assertSelectorTextContains('#main', 'Your account is not active.');
+        $translator = $this->getService(TranslatorInterface::class);
+        $this->assertSelectorTextContains('#main', $translator->trans('your_account_is_not_active'));
     }
 
     public function testUserCantLoginWithWrongPassword(): void
