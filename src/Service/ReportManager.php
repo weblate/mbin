@@ -7,9 +7,11 @@ namespace App\Service;
 use App\DTO\ReportDto;
 use App\Entity\Report;
 use App\Entity\User;
+use App\Event\Report\ReportApprovedEvent;
 use App\Event\Report\ReportRejectedEvent;
 use App\Event\Report\SubjectReportedEvent;
 use App\Exception\SubjectHasBeenReportedException;
+use App\Factory\ContentManagerFactory;
 use App\Factory\ReportFactory;
 use App\Repository\ReportRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -21,7 +23,8 @@ class ReportManager
         private readonly ReportFactory $factory,
         private readonly ReportRepository $repository,
         private readonly EventDispatcherInterface $dispatcher,
-        private readonly EntityManagerInterface $entityManager
+        private readonly EntityManagerInterface $entityManager,
+        private readonly ContentManagerFactory $managerFactory,
     ) {
     }
 
@@ -51,12 +54,27 @@ class ReportManager
         return $report;
     }
 
-    public function reject(Report $report)
+    public function reject(Report $report, User $user): void
     {
+        $manager = $this->managerFactory->createManager($report->getSubject());
+
         $report->status = Report::STATUS_REJECTED;
+
+        if ($report->getSubject()->isTrashed()) {
+            $manager->restore($user, $report->getSubject());
+        }
 
         $this->entityManager->flush();
 
         $this->dispatcher->dispatch(new ReportRejectedEvent($report));
+    }
+
+    public function accept(Report $report, User $user): void
+    {
+        $manager = $this->managerFactory->createManager($report->getSubject());
+
+        $manager->delete($user, $report->getSubject());
+
+        $this->dispatcher->dispatch(new ReportApprovedEvent($report));
     }
 }

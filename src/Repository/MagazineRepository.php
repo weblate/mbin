@@ -12,7 +12,6 @@ use App\Entity\MagazineSubscription;
 use App\Entity\Moderator;
 use App\Entity\Post;
 use App\Entity\PostComment;
-use App\Entity\Report;
 use App\Entity\User;
 use App\PageView\MagazinePageView;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -67,8 +66,7 @@ class MagazineRepository extends ServiceEntityRepository
     {
         $qb = $this->createQueryBuilder('m')
             ->andWhere('m.visibility = :visibility')
-            ->setParameter('visibility', VisibilityInterface::VISIBILITY_VISIBLE)
-        ;
+            ->setParameter('visibility', VisibilityInterface::VISIBILITY_VISIBLE);
 
         if ($criteria->query) {
             $restrictions = 'LOWER(m.name) LIKE LOWER(:q) OR LOWER(m.title) LIKE LOWER(:q)';
@@ -190,11 +188,13 @@ class MagazineRepository extends ServiceEntityRepository
         return $bans;
     }
 
-    public function findReports(Magazine $magazine, ?int $page = 1): PagerfantaInterface
+    public function findReports(Magazine $magazine, ?string $status, ?int $page = 1): PagerfantaInterface
     {
-        $criteria = Criteria::create()
-            ->andWhere(Criteria::expr()->eq('status', Report::STATUS_PENDING))
-            ->orderBy(['weight' => 'ASC']);
+        $criteria = Criteria::create();
+        if ($status) {
+            $criteria->andWhere(Criteria::expr()->eq('status', $status));
+        }
+        $criteria->orderBy(['weight' => 'ASC', 'createdAt' => 'DESC']);
 
         $bans = new Pagerfanta(new SelectableAdapter($magazine->reports, $criteria));
         $bans->setMaxPerPage($criteria->perPage ?? self::PER_PAGE);
