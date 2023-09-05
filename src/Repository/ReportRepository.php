@@ -135,7 +135,7 @@ class ReportRepository extends ServiceEntityRepository
             ->getOneOrNullResult();
     }
 
-    public function findAllPaginated(int $page = 1, ?string $status = null): PagerfantaInterface
+    public function findAllPaginated(int $page = 1, string $status = null): PagerfantaInterface
     {
         $dql = 'SELECT r FROM '.Report::class.' r';
 
