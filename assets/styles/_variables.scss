@@ -74,6 +74,7 @@ $aspect-ratios: (
   --kbin-input-bg: #fff;
   --kbin-input-text-color: var(--kbin-text-color);
   --kbin-input-border: 1px solid #e5eaec;
+  --kbin-input-placeholder-text-color: #929497;
 
   // buttons
   --kbin-button-primary-bg: #4e3a8c;
@@ -121,6 +122,9 @@ $aspect-ratios: (
   --kbin-vote-text-hover-color: #000;
   --kbin-upvoted-color: #0f5132;
   --kbin-downvoted-color: #842029;
+  
+  //boost
+  --kbin-boosted-color: var(--kbin-upvoted-color);
 
   // alerts
   --kbin-alert-info-bg: #fff3cd;
@@ -146,5 +150,8 @@ $aspect-ratios: (
   --kbin-footer-text-color: #fff;
   --kbin-footer-link-color: #fff;
   --kbin-footer-link-hover-color: var(--kbin-header-link-hover-color);
+
+  //fontawesome
+  --kbin-font-awesome-font-family: "Font Awesome 6 Free";
 }
 

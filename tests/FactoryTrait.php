@@ -2,28 +2,46 @@
 
 namespace App\Tests;
 
+use ApiPlatform\Api\UrlGeneratorInterface;
 use App\DTO\EntryCommentDto;
 use App\DTO\EntryDto;
 use App\DTO\MagazineBanDto;
 use App\DTO\MagazineDto;
+use App\DTO\MessageDto;
+use App\DTO\OAuth2ClientDto;
 use App\DTO\PostCommentDto;
 use App\DTO\PostDto;
+use App\DTO\UserDto;
+use App\Entity\Client;
 use App\Entity\Contracts\VotableInterface;
 use App\Entity\Entry;
 use App\Entity\EntryComment;
 use App\Entity\Image;
 use App\Entity\Magazine;
+use App\Entity\Message;
+use App\Entity\MessageThread;
+use App\Entity\Notification;
 use App\Entity\Post;
 use App\Entity\PostComment;
+use App\Entity\Site;
 use App\Entity\User;
+use App\Factory\MagazineFactory;
+use App\Repository\NotificationRepository;
+use App\Repository\SiteRepository;
 use App\Service\EntryCommentManager;
 use App\Service\EntryManager;
 use App\Service\FavouriteManager;
 use App\Service\MagazineManager;
+use App\Service\MessageManager;
 use App\Service\PostCommentManager;
 use App\Service\PostManager;
+use App\Service\UserManager;
 use App\Service\VoteManager;
 use Doctrine\ORM\EntityManagerInterface;
+use League\Bundle\OAuth2ServerBundle\Manager\ClientManagerInterface;
+use League\Bundle\OAuth2ServerBundle\ValueObject\Grant;
+use League\Bundle\OAuth2ServerBundle\ValueObject\RedirectUri;
+use League\Bundle\OAuth2ServerBundle\ValueObject\Scope;
 
 trait FactoryTrait
 {
@@ -69,7 +87,7 @@ trait FactoryTrait
         ];
     }
 
-    private function createUser(string $username, string $email = null, string $password = null, $active = true, $hideAdult = true): User
+    private function createUser(string $username, string $email = null, string $password = null, $active = true, $hideAdult = true, $about = null): User
     {
         $manager = $this->getService(EntityManagerInterface::class);
 
@@ -85,6 +103,7 @@ trait FactoryTrait
         $user->showProfileFollowings = true;
         $user->showProfileSubscriptions = true;
         $user->hideAdult = $hideAdult;
+        $user->about = $about;
         $user->avatar = $this->createImage(bin2hex(random_bytes(20)).'.png');
 
         $manager->persist($user);
@@ -93,6 +112,81 @@ trait FactoryTrait
         $this->users->add($user);
 
         return $user;
+    }
+
+    public function createMessage(User $to, User $from, string $content): Message
+    {
+        $thread = $this->createMessageThread($to, $from, $content);
+        /** @var Message $message */
+        $message = $thread->messages->get(0);
+
+        return $message;
+    }
+
+    public function createMessageThread(User $to, User $from, string $content): MessageThread
+    {
+        $messageManager = $this->getService(MessageManager::class);
+        $dto = new MessageDto();
+        $dto->body = $content;
+
+        return $messageManager->toThread($dto, $from, $to);
+    }
+
+    public static function createOAuth2AuthCodeClient(): void
+    {
+        /** @var ClientManagerInterface $manager */
+        $manager = self::getContainer()->get(ClientManagerInterface::class);
+
+        $client = new Client('/kbin Test Client', 'testclient', 'testsecret');
+        $client->setDescription('An OAuth2 client for testing purposes');
+        $client->setContactEmail('test@kbin.test');
+        $client->setScopes(...array_map(fn (string $scope) => new Scope($scope), OAuth2ClientDto::AVAILABLE_SCOPES));
+        $client->setGrants(new Grant('authorization_code'), new Grant('refresh_token'));
+        $client->setRedirectUris(new RedirectUri('https://localhost:3001'));
+
+        $manager->save($client);
+    }
+
+    public static function createOAuth2PublicAuthCodeClient(): void
+    {
+        /** @var ClientManagerInterface $manager */
+        $manager = self::getContainer()->get(ClientManagerInterface::class);
+
+        $client = new Client('/kbin Test Client', 'testpublicclient', null);
+        $client->setDescription('An OAuth2 public client for testing purposes');
+        $client->setContactEmail('test@kbin.test');
+        $client->setScopes(...array_map(fn (string $scope) => new Scope($scope), OAuth2ClientDto::AVAILABLE_SCOPES));
+        $client->setGrants(new Grant('authorization_code'), new Grant('refresh_token'));
+        $client->setRedirectUris(new RedirectUri('https://localhost:3001'));
+
+        $manager->save($client);
+    }
+
+    public static function createOAuth2ClientCredsClient(): void
+    {
+        /** @var ClientManagerInterface $clientManager */
+        $clientManager = self::getContainer()->get(ClientManagerInterface::class);
+
+        /** @var UserManager $userManager */
+        $userManager = self::getContainer()->get(UserManager::class);
+
+        $client = new Client('/kbin Test Client', 'testclient', 'testsecret');
+
+        $userDto = new UserDto();
+        $userDto->username = 'test_bot';
+        $userDto->email = 'test@kbin.test';
+        $userDto->plainPassword = hash('sha512', random_bytes(32));
+        $userDto->isBot = true;
+        $user = $userManager->create($userDto, false, false);
+        $client->setUser($user);
+
+        $client->setDescription('An OAuth2 client for testing purposes');
+        $client->setContactEmail('test@kbin.test');
+        $client->setScopes(...array_map(fn (string $scope) => new Scope($scope), OAuth2ClientDto::AVAILABLE_SCOPES));
+        $client->setGrants(new Grant('client_credentials'));
+        $client->setRedirectUris(new RedirectUri('https://localhost:3001'));
+
+        $clientManager->save($client);
     }
 
     private function provideMagazines(): iterable
@@ -130,7 +224,7 @@ trait FactoryTrait
         ];
     }
 
-    protected function getUserByUsername(string $username, bool $isAdmin = false, bool $hideAdult = true): User
+    protected function getUserByUsername(string $username, bool $isAdmin = false, bool $hideAdult = true, string $about = null, bool $active = true): User
     {
         $user = $this->users->filter(
             static function (User $user) use ($username) {
@@ -138,7 +232,7 @@ trait FactoryTrait
             }
         )->first();
 
-        $user = $user ?: $this->createUser($username, hideAdult: $hideAdult);
+        $user = $user ?: $this->createUser($username, hideAdult: $hideAdult, about: $about, active: $active);
 
         if ($isAdmin) {
             $user->roles = ['ROLE_ADMIN'];
@@ -212,7 +306,7 @@ trait FactoryTrait
             $magazine,
             $actor,
             $owner,
-            (new MagazineBanDto())->create('test', new \DateTime('+1 day'))
+            MagazineBanDto::create('test', new \DateTime('+1 day'))
         );
     }
 
@@ -225,6 +319,57 @@ trait FactoryTrait
         )->first();
 
         return $magazine ?: $this->createMagazine($name, null, $user, $isAdult);
+    }
+
+    protected function getMagazineByNameNoRSAKey(string $name, User $user = null, bool $isAdult = false): Magazine
+    {
+        $magazine = $this->magazines->filter(
+            static function (Magazine $magazine) use ($name) {
+                return $magazine->name === $name;
+            }
+        )->first();
+
+        if ($magazine) {
+            return $magazine;
+        }
+
+        $dto = new MagazineDto();
+        $dto->name = $name;
+        $dto->title = $title ?? 'Magazine title';
+        $dto->isAdult = $isAdult;
+
+        if (str_contains($name, '@')) {
+            [$name, $host] = explode('@', $name);
+            $dto->apId = $name;
+            $dto->apProfileId = "https://{$host}/m/{$name}";
+        }
+
+        $factory = $this->getService(MagazineFactory::class);
+        $magazine = $factory->createFromDto($dto, $user ?? $this->getUserByUsername('JohnDoe'));
+        $magazine->apId = $dto->apId;
+        $magazine->apProfileId = $dto->apProfileId;
+
+        if (!$dto->apId) {
+            $urlGenerator = $this->getService(UrlGeneratorInterface::class);
+            $magazine->publicKey = 'fakepublic';
+            $magazine->privateKey = 'fakeprivate';
+            $magazine->apProfileId = $urlGenerator->generate(
+                'ap_magazine',
+                ['name' => $magazine->name],
+                UrlGeneratorInterface::ABS_URL
+            );
+        }
+
+        $entityManager = $this->getService(EntityManagerInterface::class);
+        $entityManager->persist($magazine);
+        $entityManager->flush();
+
+        $manager = $this->getService(MagazineManager::class);
+        $manager->subscribe($magazine, $user ?? $this->getUserByUsername('JohnDoe'));
+
+        $this->magazines->add($magazine);
+
+        return $magazine;
     }
 
     protected function getEntryByTitle(
@@ -292,8 +437,8 @@ trait FactoryTrait
             $dto = new EntryCommentDto();
             $dto->entry = $entry ?? $this->getEntryByTitle('test entry content', 'https://kbin.pub');
             $dto->body = $body;
-            $dto->lang = 'en';
         }
+        $dto->lang = 'en';
 
         return $manager->create($dto, $user ?? $this->getUserByUsername('JohnDoe'));
     }
@@ -321,6 +466,19 @@ trait FactoryTrait
         return $manager->create($dto, $user ?? $this->getUserByUsername('JohnDoe'));
     }
 
+    public function createPostCommentReply(string $body, Post $post = null, User $user = null, PostComment $parent = null): PostComment
+    {
+        $manager = $this->getService(PostCommentManager::class);
+
+        $dto = new PostCommentDto();
+        $dto->post = $post ?? $this->createPost('test post content');
+        $dto->body = $body;
+        $dto->lang = 'en';
+        $dto->parent = $parent ?? $this->createPostComment('test parent comment', $dto->post);
+
+        return $manager->create($dto, $user ?? $this->getUserByUsername('JohnDoe'));
+    }
+
     public function createImage(string $fileName): Image
     {
         return new Image(
@@ -331,5 +489,70 @@ trait FactoryTrait
             100,
             null,
         );
+    }
+
+    public function createMessageNotification(User $to = null, User $from = null): Notification
+    {
+        $messageManager = $this->getService(MessageManager::class);
+        $repository = $this->getService(NotificationRepository::class);
+
+        $dto = new MessageDto();
+        $dto->body = 'test message';
+        $messageManager->toThread($dto, $from ?? $this->getUserByUsername('JaneDoe'), $to ?? $this->getUserByUsername('JohnDoe'));
+
+        return $repository->findOneBy(['user' => $to ?? $this->getUserByUsername('JohnDoe')]);
+    }
+
+    protected function createInstancePages(): Site
+    {
+        $siteRepository = $this->getService(SiteRepository::class);
+        $entityManager = $this->getService(EntityManagerInterface::class);
+        $results = $siteRepository->findAll();
+        $site = null;
+        if (!count($results)) {
+            $site = new Site();
+        } else {
+            $site = $results[0];
+        }
+        $site->about = 'about';
+        $site->contact = 'contact';
+        $site->faq = 'faq';
+        $site->privacyPolicy = 'privacyPolicy';
+        $site->terms = 'terms';
+
+        $entityManager->persist($site);
+        $entityManager->flush();
+
+        return $site;
+    }
+
+    /**
+     * Creates 5 modlog messages, one each of:
+     *   * log_entry_deleted
+     *   * log_entry_comment_deleted
+     *   * log_post_deleted
+     *   * log_post_comment_deleted
+     *   * log_ban.
+     */
+    public function createModlogMessages(): void
+    {
+        $magazineManager = $this->getService(MagazineManager::class);
+        $entryManager = $this->getService(EntryManager::class);
+        $entryCommentManager = $this->getService(EntryCommentManager::class);
+        $postManager = $this->getService(PostManager::class);
+        $postCommentManager = $this->getService(PostCommentManager::class);
+        $moderator = $this->getUserByUsername('moderator');
+        $magazine = $this->getMagazineByName('acme', $moderator);
+        $user = $this->getUserByUsername('user');
+        $post = $this->createPost('test post', $magazine, $user);
+        $entry = $this->getEntryByTitle('A title', body: 'test entry', magazine: $magazine, user: $user);
+        $postComment = $this->createPostComment('test comment', $post, $user);
+        $entryComment = $this->createEntryComment('test comment 2', $entry, $user);
+
+        $entryCommentManager->delete($moderator, $entryComment);
+        $entryManager->delete($moderator, $entry);
+        $postCommentManager->delete($moderator, $postComment);
+        $postManager->delete($moderator, $post);
+        $magazineManager->ban($magazine, $user, $moderator, MagazineBanDto::create('test ban', new \DateTimeImmutable('+12 hours')));
     }
 }

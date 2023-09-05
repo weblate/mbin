@@ -34,6 +34,7 @@
                 <li><a href="{{ path('page_faq') }}">{{ 'faq'|trans }}</a></li>
                 <li><a href="{{ path('page_terms') }}">{{ 'terms'|trans }}</a></li>
                 <li><a href="{{ path('page_privacy_policy') }}">{{ 'privacy_policy'|trans }}</a></li>
+                {% if kbin_federation_page_enabled() %}<li><a href="{{ path('page_federation') }}">{{ 'federation'|trans }}</a></li>{% endif %} 
             </menu>
         </section>
         <section>
@@ -63,26 +64,13 @@
                     </li>
                 </menu>
                 <div class="lang-switch">
-                    {% set languages = {
-                        'de': 'Deutsch',
-                        'el': 'Ελληνικά',
-                        'en': 'English',
-                        'es': 'Español',
-                        'fr': 'Français',
-                        'it': 'Italiano',
-                        'ja': '日本語',
-                        'nl': 'Dutch',
-                        'pl': 'Polski',
-                        'pt': 'Português',
-                        'tr': 'Türkçe',
-                    } %}
                     {% set header_accept_language = app.request.headers.has('accept_language')
                         ? app.request.headers.get('accept_language')|slice(0,2)
                         : null %}
                     {% set current = app.request.cookies.get('kbin_lang') ?? header_accept_language ?? kbin_default_lang() %}
                     <select data-action="kbin#changeLang">
-                        {% for code, local_name in languages %}
-                            <option value="{{ code }}" {{ code is same as current ? 'selected' : '' }}>{{ local_name }}</option>
+                        {% for code in ['de', 'el', 'en', 'eo', 'es', 'fr', 'it', 'ja', 'nl', 'pl', 'pt', 'tr', 'zh_TW'] %}
+                            <option value="{{ code }}" {{ code is same as current ? 'selected' : '' }}>{{ code|language_name(code) }}</option>
                         {% endfor %}
                     </select>
                 </div>

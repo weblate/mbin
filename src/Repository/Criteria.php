@@ -47,6 +47,15 @@ abstract class Criteria
         self::FRONT_MODERATED,
     ];
 
+    public const SORT_OPTIONS = [
+        self::SORT_ACTIVE,
+        self::SORT_HOT,
+        self::SORT_NEW,
+        self::SORT_OLD,
+        self::SORT_TOP,
+        self::SORT_COMMENTED,
+    ];
+
     public const TIME_OPTIONS = [
         self::TIME_6_HOURS,
         self::TIME_12_HOURS,
@@ -55,6 +64,24 @@ abstract class Criteria
         self::TIME_MONTH,
         self::TIME_YEAR,
         self::TIME_ALL,
+    ];
+
+    public const TIME_ROUTES_EN = [
+        '3h',
+        '6h',
+        '12h',
+        '1d',
+        '1w',
+        '1m',
+        '1y',
+        '∞',
+        'all',
+    ];
+
+    public const AP_OPTIONS = [
+        self::AP_ALL,
+        self::AP_FEDERATED,
+        self::AP_LOCAL,
     ];
 
     public int $page = 1;
@@ -71,6 +98,7 @@ abstract class Criteria
     public bool $subscribed = false;
     public ?string $tag = null;
     public ?string $domain = null;
+    public ?array $languages = null;
 
     public function __construct(int $page)
     {
@@ -103,6 +131,16 @@ abstract class Criteria
     public function setDomain(string $name): self
     {
         $this->domain = $name;
+
+        return $this;
+    }
+
+    public function addLanguage(string $lang): self
+    {
+        if (null === $this->languages) {
+            $this->languages = [];
+        }
+        array_push($this->languages, $lang);
 
         return $this;
     }

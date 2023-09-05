@@ -1,5 +1,9 @@
 <?php
 
+// SPDX-FileCopyrightText: Copyright (c) 2016-2017 Emma <emma1312@protonmail.ch>
+//
+// SPDX-License-Identifier: Zlib
+
 declare(strict_types=1);
 
 namespace App\Repository;
@@ -192,7 +196,7 @@ class EntryCommentRepository extends ServiceEntityRepository implements TagRepos
 
             if (!$criteria->domain) {
                 $qb->andWhere(
-                    'ce.domain NOT IN (SELECT IDENTITY(db.domain) FROM '.DomainBlock::class.' db WHERE db.user = :blocker)'
+                    'ce.domain IS null OR ce.domain NOT IN (SELECT IDENTITY(db.domain) FROM '.DomainBlock::class.' db WHERE db.user = :blocker)'
                 );
             }
 

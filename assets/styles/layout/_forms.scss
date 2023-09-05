@@ -75,6 +75,21 @@ textarea {
   color: var(--kbin-input-text-color);
   font-family: var(--kbin-body-font-family);
   font-size: .9rem;
+
+  &::placeholder{
+    color: var(--kbin-input-placeholder-text-color)!important;
+  }
+}
+
+input,
+textarea,
+select,
+button{
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 }
 
 textarea {
@@ -85,17 +100,97 @@ textarea {
   width: 100%;
 }
 
+input[type=radio]{
+  border-radius:  50%;
+}
+
+input[type=checkbox],
+input[type=radio]{
+  -webkit-appearance: none;
+  appearance: none;
+  font-size: 0.9rem;
+  display: grid;
+  margin: 0px;
+  width: 1.5rem;
+  height: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  align-content: center;
+  cursor: pointer;
+
+  &::before{
+    font-family: var(--kbin-font-awesome-font-family);
+    content: "\f00c";
+    transform: scale(0);
+    transition: 100ms transform ease-in;
+  }
+
+  &:checked::before{
+    transform: scale(1);
+  }
+
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+}
+
 label {
   display: block;
 }
 
 input[type=text],
 input[type=email],
-input[type=password] {
+input[type=password],
+input[type=select-one] {
   display: block;
   padding: 1rem .5rem;
   width: 100%;
 }
+
+.password-preview{
+  display: grid;
+  grid-template-areas:
+      "label label"
+      "password preview";
+  justify-items: start;
+  align-items: end;
+  grid-template-columns: 2fr 0fr;
+
+  label{
+    grid-area: label;
+  }
+
+  input[type=password],
+  input[type=text]{
+    grid-area: password;
+    width: 100%;
+
+    .rounded-edges &{
+      border-top-right-radius: 0px!important;
+      border-bottom-right-radius: 0px!important;
+    }
+  }
+
+  .password-preview-button{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-area: preview;
+    width: 40px;
+    cursor: pointer;
+    height: 100%;
+    margin: 0;
+
+    .rounded-edges &{
+      border-top-left-radius: 0px!important;
+      border-bottom-left-radius: 0px!important;
+    }
+  }
+}
+
+
 
 form {
   div {
@@ -112,6 +207,10 @@ form {
     ul li {
       padding: 0;
     }
+  }
+
+  .help-text{
+    font-size: 0.8rem;
   }
 }
 
@@ -241,6 +340,36 @@ form {
 
 .actions ul {
   margin: 0;
+
+  > img {
+      height: max-content;
+      order: -2;
+      flex: calc(100% - 2.5rem);
+      width: 100%;
+      max-height: 15rem;
+      margin-bottom: .75rem;
+      object-fit: contain;
+      background-color: hsla(0, 0%, 0%, 0.75);
+
+      .rounded-edges & {
+        border-radius: var(--kbin-rounded-edges-radius);
+      }
+
+      + .btn-link {
+        order: -1;
+        width: 2rem;
+        height: 2rem;
+        margin-left: -2.25rem;
+        color: var(--kbin-button-secondary-text-color);
+        background: var(--kbin-button-secondary-bg);
+        border: var(--kbin-button-secondary-border);
+
+        &:hover {
+          color: var(--kbin-button-secondary-text-hover-color);
+          background: var(--kbin-button-secondary-hover-bg);
+        }
+      }
+  }
 }
 
 .actions,
@@ -252,7 +381,6 @@ form {
   align-items: center;
 
   .btn-link i {
-    bottom: 15px;
     position: relative;
   }
 
@@ -262,6 +390,7 @@ form {
 
   div button {
     height: 100%;
+    white-space: nowrap;
   }
 
   .ts-control {
@@ -277,6 +406,11 @@ form {
   }
 }
 
+.row.actions ul {
+  flex-flow: row wrap;
+  width: 100%;
+}
+
 select {
   background: var(--kbin-button-secondary-bg);
   border: var(--kbin-button-secondary-border);
@@ -289,7 +423,6 @@ select {
 
 .actions {
   @include media-breakpoint-down(sm) {
-    display: block;
     text-align: right;
 
     > * {
@@ -320,33 +453,6 @@ select {
     label {
       margin-right: 1rem;
     }
-  }
-}
-
-.image-preview-container {
-  display: flex !important;
-  justify-content: center;
-  align-items: center;
-  position: relative;
-  background: black !important;
-
-  img {
-    display: none;
-    max-width: 100%;
-    max-height: 100%;
-  }
-
-  .image-preview-clear {
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 1.75em;
-    height: 1.75em;
-    padding: 0 !important;
-    text-align: center;
-    color: black !important;
-    font-weight: bold !important;
-    display: none !important;
   }
 }
 

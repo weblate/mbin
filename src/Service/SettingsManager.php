@@ -30,6 +30,8 @@ class SettingsManager
         private readonly bool $kbinRegistrationsEnabled,
         private readonly bool $kbinHeaderLogo,
         private readonly bool $kbinCaptchaEnabled,
+        private readonly bool $kbinFederationPageEnabled,
+        private readonly bool $kbinAdminOnlyOauthClients,
     ) {
         if (!self::$dto) {
             $results = $this->repository->findAll();
@@ -58,6 +60,9 @@ class SettingsManager
                 $this->find($results, 'KBIN_HEADER_LOGO', FILTER_VALIDATE_BOOLEAN) ?? $this->kbinHeaderLogo,
                 $this->find($results, 'KBIN_CAPTCHA_ENABLED', FILTER_VALIDATE_BOOLEAN) ?? $this->kbinCaptchaEnabled,
                 $this->find($results, 'KBIN_MERCURE_ENABLED', FILTER_VALIDATE_BOOLEAN) ?? true,
+                $this->find($results, 'KBIN_FEDERATION_PAGE_ENABLED', FILTER_VALIDATE_BOOLEAN) ?? $this->kbinFederationPageEnabled,
+                $this->find($results, 'KBIN_ADMIN_ONLY_OAUTH_CLIENTS', FILTER_VALIDATE_BOOLEAN) ?? $this->kbinAdminOnlyOauthClients,
+                $this->find($results, 'KBIN_FEDERATED_SEARCH_ONLY_LOGGEDIN', FILTER_VALIDATE_BOOLEAN) ?? true
             );
         }
     }

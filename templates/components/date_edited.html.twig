@@ -1,0 +1,8 @@
+{% if editedAt %}
+    {% if editedAt|date('U') - createdAt|date('U') > 300 %}
+        <span class="edited">({{ 'edited'|trans }}
+            <time class="timeago"
+                  title="{{ editedAt|date('c') }}"
+                  datetime="{{ editedAt|date('c') }}">{{ editedAt|ago }}</time>)</span>
+    {% endif %}
+{% endif %}

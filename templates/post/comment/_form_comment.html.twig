@@ -18,19 +18,11 @@
 <h3 hidden>{{ title }}</h3>
 {{ form_start(form, {action: action, attr: {class: edit ? 'comment-edit replace' : 'comment-add'}}) }}
 <div class="row">
-    {{ component('editor_toolbar', {id: 'post_comment_body'}) }}
+    {{ component('editor_toolbar', {id: form.body.vars.id}) }}
     {{ form_row(form.body, {label: false, attr: {'data-controller': 'rich-textarea'}}) }}
 </div>
 <div class="row actions">
     <ul>
-        <li>
-            <button type="button"
-                    class="btn btn__secondary"
-                    aria-label="{{ 'markdown_howto'|trans }}"
-                    title="{{ 'markdown_howto'|trans }}">
-                <i class="fa-solid fa-circle-question"></i>
-            </button>
-        </li>
         {% if hasImage %}
             <img width="40"
                  height="40"

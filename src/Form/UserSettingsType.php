@@ -49,6 +49,14 @@ class UserSettingsType extends AbstractType
                 'multiple' => true,
                 'choice_self_translation' => true,
             ])
+            ->add('customCss', TextareaType::class, [
+                'required' => false,
+            ])
+            ->add(
+                'ignoreMagazinesCustomCss',
+                CheckboxType::class,
+                ['required' => false]
+            )
             ->add(
                 'showProfileSubscriptions',
                 CheckboxType::class,

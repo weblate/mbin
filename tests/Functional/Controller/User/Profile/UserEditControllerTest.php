@@ -11,6 +11,14 @@ use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 
 class UserEditControllerTest extends WebTestCase
 {
+    public string $kibbyPath;
+
+    public function __construct($name = null, array $data = [], $dataName = '')
+    {
+        parent::__construct($name, $data, $dataName);
+        $this->kibbyPath = dirname(__FILE__, 5).'/assets/kibby_emoji.png';
+    }
+
     public function testUserCanSeeSettingsLink(): void
     {
         $client = $this->createClient();
@@ -42,6 +50,44 @@ class UserEditControllerTest extends WebTestCase
         $client->request('GET', '/people');
 
         $this->assertSelectorTextContains('#main .user-box', 'JohnDoe');
+    }
+
+    public function testUserCanUploadAvatar(): void
+    {
+        $client = $this->createClient();
+        $user = $this->getUserByUsername('JohnDoe');
+        $client->loginUser($user);
+        $repository = $this->getService(UserRepository::class);
+
+        $crawler = $client->request('GET', '/settings/profile');
+        $this->assertSelectorTextContains('#main .options__main a.active', 'profile');
+        $this->assertStringContainsString('/dev/random', $user->avatar->filePath);
+
+        $form = $crawler->filter('#main form[name=user_basic]')->selectButton('Save')->form();
+        $form['user_basic[avatar]']->upload($this->kibbyPath);
+        $client->submit($form);
+
+        $user = $repository->find($user->getId());
+        $this->assertStringContainsString(self::KIBBY_PNG_URL_RESULT, $user->avatar->filePath);
+    }
+
+    public function testUserCanUploadCover(): void
+    {
+        $client = $this->createClient();
+        $user = $this->getUserByUsername('JohnDoe');
+        $client->loginUser($user);
+        $repository = $this->getService(UserRepository::class);
+
+        $crawler = $client->request('GET', '/settings/profile');
+        $this->assertSelectorTextContains('#main .options__main a.active', 'profile');
+        $this->assertNull($user->cover);
+
+        $form = $crawler->filter('#main form[name=user_basic]')->selectButton('Save')->form();
+        $form['user_basic[cover]']->upload($this->kibbyPath);
+        $client->submit($form);
+
+        $user = $repository->find($user->getId());
+        $this->assertStringContainsString(self::KIBBY_PNG_URL_RESULT, $user->cover->filePath);
     }
 
     public function testUserCanChangePassword(): void

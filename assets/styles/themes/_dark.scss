@@ -55,6 +55,7 @@
   --kbin-input-bg: #1c1c1c;
   --kbin-input-text-color: var(--kbin-text-color);
   --kbin-input-border: 1px solid #373737;
+  --kbin-input-placeholder-text-color: #878787;
 
   // buttons
   --kbin-button-primary-bg: var(--kbin-primary-color);
@@ -95,6 +96,9 @@
   --kbin-vote-text-hover-color: #fafafa;
   --kbin-upvoted-color: #24b270;
   --kbin-downvoted-color: #dc2f3f;
+
+   //boost
+   --kbin-boosted-color: var(--kbin-upvoted-color);
 
   // alerts
   --kbin-alert-info-bg: rgba(153,116,4,0.15);

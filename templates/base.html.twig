@@ -29,8 +29,9 @@
     {% block javascripts %}
         {{ encore_entry_script_tags('app') }}
         {% if kbin_mercure_enabled() %}
-            {#        <script type="application/json" id="mercure-url">{{ mercure()|raw }}</script> #}
-            <script type="application/json" id="mercure-url">{{- 'https://' ~ kbin_domain() ~ '/.well-known/mercure' }}</script>
+        {#        <script type="application/json" id="mercure-url">{{ mercure()|raw }}</script> #}
+        <script type="application/json"
+                id="mercure-url">{{- 'https://' ~ kbin_domain() ~ '/.well-known/mercure' }}</script>
         {% endif %}
         <script>
             window.KBIN_USER = "{{ app.user ? app.user.username : null }}";
@@ -47,9 +48,16 @@
         </script>
     {% endblock %}
 
-    {% if magazine is defined and magazine %}
+    {% if not app.user or not app.user.ignoreMagazinesCustomCss %}
+        {% if magazine is defined and magazine %}
+            <style>
+                {{ magazine.customCss }}
+            </style>
+        {% endif %}
+    {% endif %}
+    {% if app.user and app.user.customCss %}
         <style>
-            {{ magazine.customCss }}
+            {{ app.user.customCss }}
         </style>
     {% endif %}
 </head>
