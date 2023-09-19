@@ -351,13 +351,12 @@
 
     .reload-required-section {
       z-index: 1;
-      background: var(--kbin-button-secondary-bg);
-      border: var(--kbin-button-secondary-border);
+      background: var(--kbin-section-bg);
+      position: sticky;
+      top: 0;
       display: none;
-      margin-top: .5rem;
       text-align: center;
       width: 100%;
-      order: 1;
       animation: showReloadRequired .25s ease-in-out forwards;
       @keyframes showReloadRequired {
         0% {
