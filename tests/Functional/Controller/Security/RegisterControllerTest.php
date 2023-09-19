@@ -8,6 +8,7 @@ use App\Entity\User;
 use App\Tests\WebTestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use function Embed\html;
 
 class RegisterControllerTest extends WebTestCase
 {
@@ -25,8 +26,7 @@ class RegisterControllerTest extends WebTestCase
         $this->assertEmailHeaderSame($email, 'To', 'johndoe@kbin.pub');
 
         $verifyLink = [];
-        preg_match('#<a href="(?P<link>.+)">#', $email->getHtmlBody(), $verifyLink);
-
+        preg_match('#<a class="btn btn__primary"[^>]*href="(?P<link>[^"]+)"[^>]*>#', $email->getHtmlBody(), $verifyLink);
         $client->request('GET', $verifyLink['link']);
         $crawler = $client->followRedirect();
 
