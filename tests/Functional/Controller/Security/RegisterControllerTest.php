@@ -8,7 +8,6 @@ use App\Entity\User;
 use App\Tests\WebTestCase;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use function Embed\html;
 
 class RegisterControllerTest extends WebTestCase
 {
