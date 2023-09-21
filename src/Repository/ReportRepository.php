@@ -145,7 +145,7 @@ class ReportRepository extends ServiceEntityRepository
             $dql .= ' WHERE r.status = :status';
         }
 
-        $dql .= ' ORDER BY r.weight DESC, r.createdAt DESC';
+        $dql .= " ORDER BY CASE WHEN r.status = 'pending' THEN 1 ELSE 2 END, r.weight DESC, r.createdAt DESC";
 
         $query = $this->getEntityManager()->createQuery($dql);
 
@@ -180,7 +180,7 @@ class ReportRepository extends ServiceEntityRepository
             $dql .= ' AND r.status = :status';
         }
 
-        $dql .= ' ORDER BY r.weight DESC, r.createdAt DESC';
+        $dql .= " ORDER BY CASE WHEN r.status = 'pending' THEN 1 ELSE 2 END, r.weight DESC, r.createdAt DESC";
 
         $query = $this->getEntityManager()->createQuery($dql);
         $query->setParameter('user', $user);
